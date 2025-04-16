@@ -1,0 +1,117 @@
+
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { Menu, X, ShoppingCart, User, Search } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { useIsMobile } from "@/hooks/use-mobile";
+
+const Navbar = () => {
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const isMobile = useIsMobile();
+  // This would be connected to a cart context in a full implementation
+  const cartItemCount = 0;
+
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
+  const navLinks = [
+    { name: "Home", path: "/" },
+    { name: "Shop", path: "/shop" },
+    { name: "Categories", path: "/categories" },
+    { name: "About", path: "/about" },
+    { name: "Contact", path: "/contact" },
+  ];
+
+  return (
+    <nav className="sticky top-0 z-40 w-full bg-white border-b border-gray-200">
+      <div className="container flex items-center justify-between h-16 mx-auto px-4">
+        {/* Logo */}
+        <Link to="/" className="flex items-center">
+          <h1 className="text-xl font-bold text-brand">Buyliance</h1>
+        </Link>
+
+        {/* Desktop Navigation */}
+        {!isMobile && (
+          <div className="flex items-center space-x-6">
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                to={link.path}
+                className="text-sm font-medium text-gray-700 transition-colors hover:text-brand"
+              >
+                {link.name}
+              </Link>
+            ))}
+          </div>
+        )}
+
+        {/* Search, Cart and Account - always visible */}
+        <div className="flex items-center space-x-4">
+          {!isMobile && (
+            <div className="relative w-40 md:w-64">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+              <Input 
+                placeholder="Search..." 
+                className="pl-8 h-9" 
+              />
+            </div>
+          )}
+
+          <Link to="/cart" className="relative">
+            <ShoppingCart className="h-5 w-5 text-gray-700" />
+            {cartItemCount > 0 && (
+              <Badge variant="destructive" className="absolute -top-2 -right-2 h-5 w-5 flex items-center justify-center p-0 text-xs">
+                {cartItemCount}
+              </Badge>
+            )}
+          </Link>
+
+          <Link to="/account">
+            <User className="h-5 w-5 text-gray-700" />
+          </Link>
+
+          {/* Mobile menu toggle */}
+          {isMobile && (
+            <Button variant="ghost" size="icon" onClick={toggleMenu}>
+              {isMenuOpen ? (
+                <X className="h-5 w-5" />
+              ) : (
+                <Menu className="h-5 w-5" />
+              )}
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Mobile Navigation */}
+      {isMobile && isMenuOpen && (
+        <div className="absolute w-full bg-white border-b border-gray-200 shadow-lg py-4">
+          <div className="container mx-auto px-4 flex flex-col space-y-4">
+            <div className="relative w-full mb-2">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
+              <Input 
+                placeholder="Search..." 
+                className="pl-8 h-9 w-full" 
+              />
+            </div>
+            {navLinks.map((link) => (
+              <Link
+                key={link.name}
+                to={link.path}
+                className="block py-2 text-sm font-medium text-gray-700 hover:text-brand"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                {link.name}
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
+    </nav>
+  );
+};
+
+export default Navbar;

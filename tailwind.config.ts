@@ -61,6 +61,19 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				// E-commerce custom colors
+				brand: {
+					DEFAULT: '#9b87f5',
+					dark: '#7E69AB',
+					light: '#E5DEFF',
+				},
+				commerce: {
+					'bg-light': '#F6F6F7',
+					'bg-dark': '#1A1F2C',
+					'gray-100': '#F1F1F1',
+					'gray-200': '#C8C8C9',
+					'gray-300': '#8E9196',
 				}
 			},
 			borderRadius: {
