@@ -1,99 +1,53 @@
 
-import React, { createContext, useContext, useReducer, ReactNode, useEffect } from 'react';
-import { User } from '@/types';
+import { createContext, useContext, useEffect, useState } from "react";
+import { Session, User } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
 
-type AuthAction = 
-  | { type: 'LOGIN'; payload: User }
-  | { type: 'LOGOUT' }
-  | { type: 'UPDATE_USER'; payload: Partial<User> };
-
-interface AuthState {
+interface AuthContextType {
+  session: Session | null;
   user: User | null;
-  isAuthenticated: boolean;
   isLoading: boolean;
+  signOut: () => Promise<void>;
 }
 
-interface AuthContextType extends AuthState {
-  login: (user: User) => void;
-  logout: () => void;
-  updateUser: (userData: Partial<User>) => void;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-const initialState: AuthState = {
+const AuthContext = createContext<AuthContextType>({
+  session: null,
   user: null,
-  isAuthenticated: false,
-  isLoading: true
-};
+  isLoading: true,
+  signOut: async () => {},
+});
 
-function authReducer(state: AuthState, action: AuthAction): AuthState {
-  switch (action.type) {
-    case 'LOGIN':
-      return {
-        ...state,
-        user: action.payload,
-        isAuthenticated: true,
-        isLoading: false
-      };
-    case 'LOGOUT':
-      return {
-        ...state,
-        user: null,
-        isAuthenticated: false,
-        isLoading: false
-      };
-    case 'UPDATE_USER':
-      return {
-        ...state,
-        user: state.user ? { ...state.user, ...action.payload } : null
-      };
-    default:
-      return state;
-  }
-}
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [session, setSession] = useState<Session | null>(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [state, dispatch] = useReducer(authReducer, initialState);
-  
   useEffect(() => {
-    // Check for logged in user in localStorage
-    const storedUser = localStorage.getItem('user');
-    
-    if (storedUser) {
-      dispatch({ type: 'LOGIN', payload: JSON.parse(storedUser) });
-    } else {
-      dispatch({ type: 'LOGOUT' });
-    }
+    // Set up auth state listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        setIsLoading(false);
+      }
+    );
+
+    // Check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setIsLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
-  
-  const login = (user: User) => {
-    localStorage.setItem('user', JSON.stringify(user));
-    dispatch({ type: 'LOGIN', payload: user });
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
   };
-  
-  const logout = () => {
-    localStorage.removeItem('user');
-    dispatch({ type: 'LOGOUT' });
-  };
-  
-  const updateUser = (userData: Partial<User>) => {
-    if (state.user) {
-      const updatedUser = { ...state.user, ...userData };
-      localStorage.setItem('user', JSON.stringify(updatedUser));
-      dispatch({ type: 'UPDATE_USER', payload: userData });
-    }
-  };
-  
+
   return (
-    <AuthContext.Provider
-      value={{
-        ...state,
-        login,
-        logout,
-        updateUser
-      }}
-    >
+    <AuthContext.Provider value={{ session, user, isLoading, signOut }}>
       {children}
     </AuthContext.Provider>
   );
@@ -101,8 +55,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
