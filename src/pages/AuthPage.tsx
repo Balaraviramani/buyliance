@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/components/ui/use-toast";
 import MainLayout from "@/components/layout/MainLayout";
+import { FormControl, FormField, FormItem, Form } from "@/components/ui/form";
 
 const authSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -36,11 +37,17 @@ const AuthPage = () => {
     setIsLoading(true);
     try {
       if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword(data);
+        const { error } = await supabase.auth.signInWithPassword({
+          email: data.email,
+          password: data.password,
+        });
         if (error) throw error;
         navigate("/");
       } else {
-        const { error } = await supabase.auth.signUp(data);
+        const { error } = await supabase.auth.signUp({
+          email: data.email,
+          password: data.password,
+        });
         if (error) throw error;
         toast({
           title: "Success!",
@@ -67,31 +74,55 @@ const AuthPage = () => {
               {isLogin ? "Welcome Back" : "Create Account"}
             </h1>
 
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <div>
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  {...form.register("email")}
-                  error={form.formState.errors.email?.message}
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field, fieldState }) => (
+                    <FormItem>
+                      <Label htmlFor="email">Email</Label>
+                      <FormControl>
+                        <Input 
+                          id="email"
+                          type="email"
+                          {...field}
+                          placeholder="Enter your email"
+                        />
+                      </FormControl>
+                      {fieldState.error && (
+                        <p className="text-sm text-red-500">{fieldState.error.message}</p>
+                      )}
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              <div>
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  {...form.register("password")}
-                  error={form.formState.errors.password?.message}
+                <FormField
+                  control={form.control}
+                  name="password"
+                  render={({ field, fieldState }) => (
+                    <FormItem>
+                      <Label htmlFor="password">Password</Label>
+                      <FormControl>
+                        <Input 
+                          id="password"
+                          type="password"
+                          {...field}
+                          placeholder="••••••••"
+                        />
+                      </FormControl>
+                      {fieldState.error && (
+                        <p className="text-sm text-red-500">{fieldState.error.message}</p>
+                      )}
+                    </FormItem>
+                  )}
                 />
-              </div>
 
-              <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Loading..." : isLogin ? "Sign In" : "Sign Up"}
-              </Button>
-            </form>
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? "Loading..." : isLogin ? "Sign In" : "Sign Up"}
+                </Button>
+              </form>
+            </Form>
 
             <div className="mt-4 text-center">
               <button

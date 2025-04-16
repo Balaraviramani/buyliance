@@ -1,17 +1,18 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import MainLayout from "@/components/layout/MainLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
 import { useAuth } from "@/context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/components/ui/use-toast";
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -27,25 +28,28 @@ const LoginPage = () => {
     });
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate login (in a real app, this would be an API call)
-    setTimeout(() => {
-      // Mock user data
-      const user = {
-        id: "user1",
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
         email: formData.email,
-        firstName: "John",
-        lastName: "Doe",
-        isAdmin: formData.email.includes("admin"),
-      };
-
-      login(user);
-      setIsLoading(false);
+        password: formData.password,
+      });
+      
+      if (error) throw error;
+      
       navigate("/");
-    }, 1000);
+    } catch (error: any) {
+      toast({
+        title: "Login failed",
+        description: error.message,
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
