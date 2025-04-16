@@ -5,10 +5,35 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { UserCircle, Package, Heart, LogOut } from "lucide-react";
+import { useState, useEffect } from "react";
+
+// Define a type for user profile data
+interface UserProfile {
+  firstName: string;
+  lastName: string;
+}
 
 const AccountPage = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const [profile, setProfile] = useState<UserProfile>({
+    firstName: "Guest",
+    lastName: "User"
+  });
+
+  useEffect(() => {
+    // Extract user metadata or use defaults
+    if (user) {
+      // Try to get profile data from user metadata or localStorage
+      const firstName = user.user_metadata?.first_name || localStorage.getItem('firstName') || "Guest";
+      const lastName = user.user_metadata?.last_name || localStorage.getItem('lastName') || "User";
+      
+      setProfile({
+        firstName,
+        lastName
+      });
+    }
+  }, [user]);
 
   if (!user) {
     navigate("/login");
@@ -38,7 +63,7 @@ const AccountPage = () => {
             <CardContent>
               <div className="space-y-2">
                 <p><span className="font-medium">Email:</span> {user.email}</p>
-                <p><span className="font-medium">Name:</span> {user.firstName} {user.lastName}</p>
+                <p><span className="font-medium">Name:</span> {profile.firstName} {profile.lastName}</p>
               </div>
             </CardContent>
             <CardFooter>
