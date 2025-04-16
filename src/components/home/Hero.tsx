@@ -15,13 +15,17 @@ const Hero = () => {
             Shop the latest trends and essentials with confidence. Quality products, exceptional service, and fast delivery.
           </p>
           <div className="flex flex-wrap gap-4">
-            <Button size="lg" className="font-medium">
-              Shop Now
-              <ChevronRight className="ml-1 h-4 w-4" />
-            </Button>
-            <Button size="lg" variant="outline" className="font-medium">
-              View Collections
-            </Button>
+            <Link to="/shop">
+              <Button size="lg" className="font-medium">
+                Shop Now
+                <ChevronRight className="ml-1 h-4 w-4" />
+              </Button>
+            </Link>
+            <Link to="/contact">
+              <Button size="lg" variant="outline" className="font-medium">
+                Contact Us
+              </Button>
+            </Link>
           </div>
           <div className="flex items-center mt-10 gap-6">
             <div className="text-center">
@@ -45,7 +49,7 @@ const Hero = () => {
             <div className="absolute -top-10 -left-10 w-40 h-40 bg-brand rounded-full opacity-20 blur-3xl"></div>
             <div className="absolute -bottom-10 -right-10 w-60 h-60 bg-brand-light rounded-full opacity-20 blur-3xl"></div>
             <img
-              src="/placeholder.svg"
+              src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158"
               alt="Featured Products"
               className="relative z-10 max-w-md rounded-2xl shadow-xl"
             />
