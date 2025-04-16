@@ -6,28 +6,28 @@ export const categories: Category[] = [
     id: "cat1",
     name: "Electronics",
     description: "Latest gadgets and electronic devices",
-    image: "/placeholder.svg",
+    image: "https://images.unsplash.com/photo-1498049794561-7780e7231661?q=80&w=2070&auto=format&fit=crop",
     slug: "electronics"
   },
   {
     id: "cat2",
     name: "Clothing",
     description: "Stylish and comfortable clothing for all seasons",
-    image: "/placeholder.svg",
+    image: "https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=2071&auto=format&fit=crop",
     slug: "clothing"
   },
   {
     id: "cat3",
     name: "Home & Kitchen",
     description: "Essential items for your home and kitchen",
-    image: "/placeholder.svg",
+    image: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?q=80&w=2070&auto=format&fit=crop",
     slug: "home-kitchen"
   },
   {
     id: "cat4",
     name: "Beauty & Personal Care",
     description: "Quality beauty and personal care products",
-    image: "/placeholder.svg",
+    image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=2080&auto=format&fit=crop",
     slug: "beauty-personal-care"
   }
 ];
@@ -40,7 +40,10 @@ export const products: Product[] = [
     price: 149.99,
     discountedPrice: 129.99,
     currency: "USD",
-    images: ["/placeholder.svg", "/placeholder.svg"],
+    images: [
+      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=2070&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1546435770-a3e426bf472b?q=80&w=2065&auto=format&fit=crop"
+    ],
     category: "Electronics",
     tags: ["headphones", "wireless", "audio", "music"],
     rating: 4.8,
@@ -56,7 +59,10 @@ export const products: Product[] = [
     description: "Latest smartphone with advanced camera system, all-day battery life, and stunning display. Perfect for photography enthusiasts and mobile gamers.",
     price: 999.99,
     currency: "USD",
-    images: ["/placeholder.svg", "/placeholder.svg"],
+    images: [
+      "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=2080&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1592750475338-74b7b21a3228?q=80&w=2087&auto=format&fit=crop"
+    ],
     category: "Electronics",
     tags: ["smartphone", "mobile", "camera", "tech"],
     rating: 4.9,
@@ -73,7 +79,10 @@ export const products: Product[] = [
     price: 199.99,
     discountedPrice: 179.99,
     currency: "USD",
-    images: ["/placeholder.svg", "/placeholder.svg"],
+    images: [
+      "https://images.unsplash.com/photo-1539874754764-5a96559165b0?q=80&w=2080&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?q=80&w=2080&auto=format&fit=crop"
+    ],
     category: "Electronics",
     tags: ["fitness", "watch", "health", "smart"],
     rating: 4.7,
@@ -89,7 +98,10 @@ export const products: Product[] = [
     description: "Premium cotton t-shirt with unique designer print. Comfortable fit for everyday wear with durable fabric that stays soft wash after wash.",
     price: 39.99,
     currency: "USD",
-    images: ["/placeholder.svg", "/placeholder.svg"],
+    images: [
+      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=2080&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1562157873-818bc0726f68?q=80&w=2080&auto=format&fit=crop"
+    ],
     category: "Clothing",
     tags: ["t-shirt", "cotton", "casual", "comfortable"],
     rating: 4.5,
@@ -106,7 +118,10 @@ export const products: Product[] = [
     price: 59.99,
     discountedPrice: 49.99,
     currency: "USD",
-    images: ["/placeholder.svg", "/placeholder.svg"],
+    images: [
+      "https://images.unsplash.com/photo-1582552938357-32b906df40cb?q=80&w=2080&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=2087&auto=format&fit=crop"
+    ],
     category: "Clothing",
     tags: ["jeans", "denim", "slim-fit", "casual"],
     rating: 4.6,
@@ -123,7 +138,10 @@ export const products: Product[] = [
     price: 249.99,
     discountedPrice: 199.99,
     currency: "USD",
-    images: ["/placeholder.svg", "/placeholder.svg"],
+    images: [
+      "https://images.unsplash.com/photo-1584990347449-b88300bd9253?q=80&w=2080&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1585837575652-267c041d77d4?q=80&w=2080&auto=format&fit=crop"
+    ],
     category: "Home & Kitchen",
     tags: ["cookware", "kitchen", "stainless-steel", "cooking"],
     rating: 4.8,
@@ -139,7 +157,10 @@ export const products: Product[] = [
     description: "Voice-controlled speaker with premium sound quality and smart home integration. Control your music, get answers, and manage your smart home devices.",
     price: 129.99,
     currency: "USD",
-    images: ["/placeholder.svg", "/placeholder.svg"],
+    images: [
+      "https://images.unsplash.com/photo-1589492477829-5e65395b66cc?q=80&w=2087&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1545454675-3531b543be5d?q=80&w=2080&auto=format&fit=crop"
+    ],
     category: "Electronics",
     tags: ["speaker", "smart-home", "voice-control", "audio"],
     rating: 4.7,
@@ -155,7 +176,10 @@ export const products: Product[] = [
     description: "Hydrating face serum made with organic ingredients. Perfect for all skin types, helping to moisturize and rejuvenate your skin naturally.",
     price: 34.99,
     currency: "USD",
-    images: ["/placeholder.svg", "/placeholder.svg"],
+    images: [
+      "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1974&auto=format&fit=crop",
+      "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=1974&auto=format&fit=crop"
+    ],
     category: "Beauty & Personal Care",
     tags: ["skincare", "organic", "face-serum", "beauty"],
     rating: 4.6,

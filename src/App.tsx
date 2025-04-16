@@ -43,6 +43,7 @@ const App = () => (
                 <Route path="/login" element={<LoginPage />} />
                 <Route path="/admin" element={<AdminDashboard />} />
                 <Route path="/contact" element={<ContactPage />} />
+                <Route path="/account" element={<AccountPage />} /> {/* Added this line */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>

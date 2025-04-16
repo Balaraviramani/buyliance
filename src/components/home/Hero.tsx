@@ -1,4 +1,3 @@
-
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
@@ -49,7 +48,7 @@ const Hero = () => {
             <div className="absolute -top-10 -left-10 w-40 h-40 bg-brand rounded-full opacity-20 blur-3xl"></div>
             <div className="absolute -bottom-10 -right-10 w-60 h-60 bg-brand-light rounded-full opacity-20 blur-3xl"></div>
             <img
-              src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158"
+              src="https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070&auto=format&fit=crop"
               alt="Featured Products"
               className="relative z-10 max-w-md rounded-2xl shadow-xl"
             />
