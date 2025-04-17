@@ -92,66 +92,6 @@ const AboutPage = () => {
         </div>
       </section>
 
-      {/* Team Section */}
-      <section className="py-16 px-4">
-        <div className="container mx-auto">
-          <h2 className="text-3xl font-bold mb-4 text-center">Our Team</h2>
-          <p className="text-gray-600 text-center max-w-2xl mx-auto mb-12">
-            Meet the passionate people behind Buyliance who work tirelessly to bring you the best shopping experience.
-          </p>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Team Member 1 */}
-            <div className="text-center">
-              <div className="mb-4 relative">
-                <img 
-                  src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?q=80&w=1780&auto=format&fit=crop" 
-                  alt="John Doe" 
-                  className="w-32 h-32 rounded-full mx-auto object-cover"
-                />
-              </div>
-              <h3 className="text-xl font-bold">John Doe</h3>
-              <p className="text-brand mb-2">CEO & Founder</p>
-              <p className="text-gray-600 text-sm">
-                With over 15 years in retail, John leads our vision and strategy.
-              </p>
-            </div>
-            
-            {/* Team Member 2 */}
-            <div className="text-center">
-              <div className="mb-4">
-                <img 
-                  src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1887&auto=format&fit=crop" 
-                  alt="Jane Smith" 
-                  className="w-32 h-32 rounded-full mx-auto object-cover"
-                />
-              </div>
-              <h3 className="text-xl font-bold">Jane Smith</h3>
-              <p className="text-brand mb-2">Head of Product</p>
-              <p className="text-gray-600 text-sm">
-                Jane ensures we offer only the highest quality products.
-              </p>
-            </div>
-            
-            {/* Team Member 3 */}
-            <div className="text-center">
-              <div className="mb-4">
-                <img 
-                  src="https://images.unsplash.com/photo-1599566150163-29194dcaad36?q=80&w=1887&auto=format&fit=crop" 
-                  alt="Mike Johnson" 
-                  className="w-32 h-32 rounded-full mx-auto object-cover"
-                />
-              </div>
-              <h3 className="text-xl font-bold">Mike Johnson</h3>
-              <p className="text-brand mb-2">Customer Experience</p>
-              <p className="text-gray-600 text-sm">
-                Mike works to make your shopping experience exceptional.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* Call to Action */}
       <section className="py-16 px-4 bg-brand text-white text-center">
         <div className="container mx-auto">

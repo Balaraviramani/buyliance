@@ -9,6 +9,12 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
 import { useToast } from "@/components/ui/use-toast";
+import { 
+  DropdownMenu, 
+  DropdownMenuContent, 
+  DropdownMenuItem, 
+  DropdownMenuTrigger 
+} from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -105,9 +111,46 @@ const Navbar = () => {
             )}
           </Link>
 
-          <button onClick={handleAccountClick}>
-            <User className="h-5 w-5 text-gray-700" />
-          </button>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="rounded-full">
+                <User className="h-5 w-5 text-gray-700" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-48">
+              {user ? (
+                <>
+                  <DropdownMenuItem onClick={() => navigate("/account")}>
+                    My Account
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/account/orders")}>
+                    My Orders
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/account/wishlist")}>
+                    My Wishlist
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => {
+                    toast({
+                      title: "Logged out",
+                      description: "You have been logged out successfully"
+                    });
+                    navigate("/");
+                  }}>
+                    Logout
+                  </DropdownMenuItem>
+                </>
+              ) : (
+                <>
+                  <DropdownMenuItem onClick={() => navigate("/auth")}>
+                    Login
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => navigate("/auth")}>
+                    Register
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
 
           {/* Mobile menu toggle */}
           {isMobile && (

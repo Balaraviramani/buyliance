@@ -8,12 +8,14 @@ import { Button } from "@/components/ui/button";
 import { Heart, Share2, ShoppingCart, Truck, RotateCcw, Shield, Star, Minus, Plus } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProductGrid from "@/components/product/ProductGrid";
+import ReviewForm from "@/components/product/ReviewForm";
 
 const ProductPage = () => {
   const { id } = useParams<{ id: string }>();
   const { addItem } = useCart();
   const [quantity, setQuantity] = useState(1);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [showReviewForm, setShowReviewForm] = useState(false);
 
   // Find the product with the matching id
   const product = products.find((p) => p.id === id);
@@ -50,6 +52,15 @@ const ProductPage = () => {
   const discountPercentage = product.discountedPrice 
     ? Math.round(((product.price - product.discountedPrice) / product.price) * 100) 
     : 0;
+
+  // Convert price display to rupees
+  const priceInRupees = product.price * 83; // Using 1 USD = 83 INR conversion rate
+  const discountedPriceInRupees = product.discountedPrice ? product.discountedPrice * 83 : null;
+
+  const handleReviewSubmitted = () => {
+    setShowReviewForm(false);
+    // In a real app, you would refresh reviews from the server
+  };
 
   return (
     <MainLayout>
@@ -135,16 +146,16 @@ const ProductPage = () => {
             </div>
 
             <div className="flex items-center">
-              {product.discountedPrice ? (
+              {discountedPriceInRupees ? (
                 <>
-                  <span className="text-3xl font-bold text-gray-900">${product.discountedPrice}</span>
-                  <span className="ml-2 text-lg text-gray-500 line-through">${product.price}</span>
+                  <span className="text-3xl font-bold text-gray-900">₹{Math.round(discountedPriceInRupees).toLocaleString('en-IN')}</span>
+                  <span className="ml-2 text-lg text-gray-500 line-through">₹{Math.round(priceInRupees).toLocaleString('en-IN')}</span>
                   <span className="ml-2 rounded-md bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-600">
                     {discountPercentage}% OFF
                   </span>
                 </>
               ) : (
-                <span className="text-3xl font-bold text-gray-900">${product.price}</span>
+                <span className="text-3xl font-bold text-gray-900">₹{Math.round(priceInRupees).toLocaleString('en-IN')}</span>
               )}
             </div>
 
@@ -220,7 +231,7 @@ const ProductPage = () => {
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 pt-6 border-t border-gray-200">
               <div className="flex items-center text-sm text-gray-600">
                 <Truck className="h-4 w-4 text-brand mr-2" />
-                Free shipping over $50
+                Free shipping over ₹4,000
               </div>
               <div className="flex items-center text-sm text-gray-600">
                 <RotateCcw className="h-4 w-4 text-brand mr-2" />
@@ -287,7 +298,7 @@ const ProductPage = () => {
                     </div>
                     <div className="flex border-b border-gray-100 py-2">
                       <span className="font-medium text-gray-900 w-40">Shipping Fee</span>
-                      <span className="text-gray-600">Free over $50</span>
+                      <span className="text-gray-600">Free over ₹4,000</span>
                     </div>
                     <div className="flex border-b border-gray-100 py-2">
                       <span className="font-medium text-gray-900 w-40">Return Policy</span>
@@ -317,14 +328,29 @@ const ProductPage = () => {
                       </div>
                       <span className="text-lg font-medium">{product.rating} out of 5</span>
                     </div>
-                    <p className="text-sm text-gray-600">Based on {product.reviews} reviews</p>
+                    <p className="text-sm text-gray-600 mb-4">Based on {product.reviews} reviews</p>
                     
                     <div className="mt-6">
-                      <Button className="w-full">Write a Review</Button>
+                      <Button 
+                        className="w-full"
+                        onClick={() => setShowReviewForm(!showReviewForm)}
+                      >
+                        {showReviewForm ? "Cancel" : "Write a Review"}
+                      </Button>
                     </div>
                   </div>
                   
                   <div className="md:w-2/3">
+                    {showReviewForm ? (
+                      <div className="border-b border-gray-100 pb-6 mb-6">
+                        <h4 className="font-medium mb-4">Write Your Review</h4>
+                        <ReviewForm 
+                          productId={product.id} 
+                          onSuccess={handleReviewSubmitted}
+                        />
+                      </div>
+                    ) : null}
+                  
                     <div className="space-y-6">
                       {/* Sample review */}
                       <div className="border-b border-gray-100 pb-6">

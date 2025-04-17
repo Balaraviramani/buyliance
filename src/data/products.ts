@@ -1,359 +1,225 @@
+import { Product } from "@/types";
+import { additionalProducts } from "./additional-products";
 
-import { Product, Category } from '@/types';
+// Convert USD to INR (assuming 1 USD = 83 INR)
+const usdToInr = (price?: number) => price ? Math.round(price * 83) : undefined;
 
-export const categories: Category[] = [
-  {
-    id: "cat1",
-    name: "Electronics",
-    description: "Latest gadgets and electronic devices",
-    image: "https://images.unsplash.com/photo-1498049794561-7780e7231661?q=80&w=2070&auto=format&fit=crop",
-    slug: "electronics"
-  },
-  {
-    id: "cat2",
-    name: "Clothing",
-    description: "Stylish and comfortable clothing for all seasons",
-    image: "https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=2071&auto=format&fit=crop",
-    slug: "clothing"
-  },
-  {
-    id: "cat3",
-    name: "Home & Kitchen",
-    description: "Essential items for your home and kitchen",
-    image: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?q=80&w=2070&auto=format&fit=crop",
-    slug: "home-kitchen"
-  },
-  {
-    id: "cat4",
-    name: "Beauty & Personal Care",
-    description: "Quality beauty and personal care products",
-    image: "https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=2080&auto=format&fit=crop",
-    slug: "beauty-personal-care"
-  }
-];
-
-export const products: Product[] = [
-  // Electronics Category
+// Existing products with INR conversion
+const existingProductsInr: Product[] = [
   {
     id: "1",
-    name: "Premium Wireless Headphones",
-    description: "High-quality wireless headphones with noise cancellation feature, perfect for music lovers and professionals alike. Enjoy crystal-clear audio and comfortable wear for extended periods.",
-    price: 12499,
-    discountedPrice: 10999,
+    name: "Wireless Noise-Cancelling Headphones",
+    description: "Experience premium sound quality with our wireless noise-cancelling headphones. Perfect for music lovers who want to block out external noise.",
+    price: usdToInr(129.99),
     currency: "₹",
-    images: [
-      "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=2070&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1546435770-a3e426bf472b?q=80&w=2065&auto=format&fit=crop"
-    ],
+    discountedPrice: usdToInr(99.99),
+    rating: 4.5,
+    reviews: 153,
+    stock: 25,
     category: "Electronics",
-    tags: ["headphones", "wireless", "audio", "music"],
-    rating: 4.8,
-    reviews: 245,
-    stock: 50,
-    featured: true,
-    createdAt: "2023-01-15T08:00:00Z",
-    updatedAt: "2023-06-10T10:30:00Z"
+    tags: ["headphones", "wireless", "audio"],
+    images: [
+      "https://images.unsplash.com/photo-1545127398-14699f92334b?q=80&w=2535&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1616424525073-d5532ee6afb2?q=80&w=2664&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1625873526852-381ab99fd305?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+    ],
+    featured: true
   },
   {
     id: "2",
-    name: "Smartphone Pro Max",
-    description: "Latest smartphone with advanced camera system, all-day battery life, and stunning display. Perfect for photography enthusiasts and mobile gamers.",
-    price: 84999,
+    name: "Smart Fitness Watch",
+    description: "Track your fitness goals with our advanced smart watch. Features include heart rate monitoring, step counting, and smartphone notifications.",
+    price: usdToInr(199.99),
     currency: "₹",
-    images: [
-      "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?q=80&w=2080&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1592750475338-74b7b21a3228?q=80&w=2087&auto=format&fit=crop"
-    ],
+    discountedPrice: usdToInr(159.99),
+    rating: 4.3,
+    reviews: 78,
+    stock: 15,
     category: "Electronics",
-    tags: ["smartphone", "mobile", "camera", "tech"],
-    rating: 4.9,
-    reviews: 320,
-    stock: 30,
-    featured: true,
-    createdAt: "2023-02-01T09:15:00Z",
-    updatedAt: "2023-05-20T14:40:00Z"
+    tags: ["smartwatch", "fitness", "wearable"],
+    images: [
+      "https://images.unsplash.com/photo-1546868871-7041f2a55e12?q=80&w=2428&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1617043786394-f977fa12eddf?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+    ],
+    featured: true
   },
   {
     id: "3",
-    name: "Smart Fitness Watch",
-    description: "Track your health metrics, workouts, and sleep patterns with this advanced fitness watch. Water-resistant and long battery life.",
-    price: 16999,
-    discountedPrice: 14999,
+    name: "Professional Camera Kit",
+    description: "Capture stunning photos with our professional camera kit. Includes a high-resolution camera body, multiple lenses, and a carrying case.",
+    price: usdToInr(999.99),
     currency: "₹",
-    images: [
-      "https://images.unsplash.com/photo-1539874754764-5a96559165b0?q=80&w=2080&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?q=80&w=2080&auto=format&fit=crop"
-    ],
+    rating: 4.8,
+    reviews: 42,
+    stock: 5,
     category: "Electronics",
-    tags: ["fitness", "watch", "health", "smart"],
+    tags: ["camera", "photography", "professional"],
+    images: [
+      "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1516724562728-afc824a36e84?q=80&w=2651&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1480365501497-199581be0e66?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+    ]
+  },
+  {
+    id: "4",
+    name: "Leather Weekend Bag",
+    description: "A stylish and durable leather weekend bag perfect for short trips. Features multiple compartments and a comfortable shoulder strap.",
+    price: usdToInr(149.99),
+    currency: "₹",
+    rating: 4.6,
+    reviews: 65,
+    stock: 20,
+    category: "Fashion",
+    tags: ["bag", "leather", "travel"],
+    images: [
+      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?q=80&w=2579&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+    ]
+  },
+  {
+    id: "5",
+    name: "Organic Cotton T-Shirt",
+    description: "A comfortable and eco-friendly t-shirt made from 100% organic cotton. Available in multiple colors and sizes.",
+    price: usdToInr(29.99),
+    currency: "₹",
+    discountedPrice: usdToInr(24.99),
+    rating: 4.2,
+    reviews: 112,
+    stock: 50,
+    category: "Fashion",
+    tags: ["clothing", "organic", "t-shirt"],
+    images: [
+      "https://images.unsplash.com/photo-1562157873-818bc0726f68?q=80&w=2654&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1503341504253-dff4815485f1?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+    ],
+    featured: true
+  },
+  {
+    id: "6",
+    name: "Designer Sunglasses",
+    description: "Protect your eyes in style with our designer sunglasses. Featuring UV protection and a comfortable fit.",
+    price: usdToInr(89.99),
+    currency: "₹",
+    discountedPrice: usdToInr(69.99),
+    rating: 4.4,
+    reviews: 48,
+    stock: 30,
+    category: "Fashion",
+    tags: ["accessories", "sunglasses", "summer"],
+    images: [
+      "https://images.unsplash.com/photo-1511499767150-a48a237f0083?q=80&w=2580&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1534118007900-95c82793a121?q=80&w=2302&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+    ]
+  },
+  {
+    id: "7",
+    name: "Aromatherapy Candle Set",
+    description: "A set of 3 aromatherapy candles to help you relax and create a calming atmosphere in your home.",
+    price: usdToInr(34.99),
+    currency: "₹",
+    rating: 4.1,
+    reviews: 87,
+    stock: 40,
+    category: "Home Decor",
+    tags: ["candles", "aromatherapy", "relaxation"],
+    images: [
+      "https://images.unsplash.com/photo-1601652589223-38f82aa24fee?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1603006905001-faa502d2e4fd?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1582126977466-ac882a29eef5?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+    ]
+  },
+  {
+    id: "8",
+    name: "Ceramic Plant Pots (Set of 3)",
+    description: "Enhance your home decor with these elegant ceramic plant pots. Perfect for small to medium indoor plants.",
+    price: usdToInr(49.99),
+    currency: "₹",
+    discountedPrice: usdToInr(39.99),
     rating: 4.7,
-    reviews: 185,
-    stock: 75,
-    featured: true,
-    createdAt: "2023-01-20T11:30:00Z",
-    updatedAt: "2023-04-15T09:20:00Z"
+    reviews: 59,
+    stock: 25,
+    category: "Home Decor",
+    tags: ["plant pots", "ceramics", "home decor"],
+    images: [
+      "https://images.unsplash.com/photo-1512428813834-c702c7702b78?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1509423350716-97f9360b4e09?q=80&w=2575&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1618810158890-4c7bc1741ec1?q=80&w=2627&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+    ]
   },
   {
     id: "9",
     name: "Bluetooth Portable Speaker",
-    description: "Compact portable speaker with impressive sound quality and 20-hour battery life. Waterproof design makes it perfect for outdoor adventures.",
-    price: 5999,
-    discountedPrice: 4999,
+    description: "Take your music anywhere with our waterproof, portable Bluetooth speaker. Up to 12 hours of battery life.",
+    price: usdToInr(79.99),
     currency: "₹",
-    images: [
-      "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?q=80&w=2069&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1589003786077-f73d7f8afb6c?q=80&w=2073&auto=format&fit=crop"
-    ],
+    discountedPrice: usdToInr(59.99),
+    rating: 4.5,
+    reviews: 134,
+    stock: 15,
     category: "Electronics",
-    tags: ["speaker", "bluetooth", "portable", "audio"],
-    rating: 4.6,
-    reviews: 128,
-    stock: 45,
-    featured: false,
-    createdAt: "2023-03-05T13:45:00Z",
-    updatedAt: "2023-07-12T09:30:00Z"
+    tags: ["speaker", "bluetooth", "portable"],
+    images: [
+      "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1589003511303-d10653ff1e1e?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1585595283238-ea010d2020cf?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+    ]
   },
   {
     id: "10",
-    name: "Ultra HD Smart TV",
-    description: "65-inch 4K Ultra HD smart television with voice control and multiple streaming apps built-in. Immersive viewing experience with brilliant colors and sharp details.",
-    price: 79999,
-    discountedPrice: 64999,
+    name: "Premium Yoga Mat",
+    description: "A non-slip, eco-friendly yoga mat perfect for all types of yoga. Comes with a carrying strap.",
+    price: usdToInr(45.99),
     currency: "₹",
-    images: [
-      "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?q=80&w=2070&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1593784991095-a205069470b6?q=80&w=2070&auto=format&fit=crop"
-    ],
-    category: "Electronics",
-    tags: ["tv", "smart", "4k", "ultra-hd"],
-    rating: 4.8,
-    reviews: 210,
-    stock: 15,
-    featured: true,
-    createdAt: "2023-02-15T10:20:00Z",
-    updatedAt: "2023-08-01T14:15:00Z"
-  },
-  
-  // Clothing Category
-  {
-    id: "4",
-    name: "Designer Cotton T-Shirt",
-    description: "Premium cotton t-shirt with unique designer print. Comfortable fit for everyday wear with durable fabric that stays soft wash after wash.",
-    price: 2999,
-    currency: "₹",
-    images: [
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?q=80&w=2080&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1562157873-818bc0726f68?q=80&w=2080&auto=format&fit=crop"
-    ],
-    category: "Clothing",
-    tags: ["t-shirt", "cotton", "casual", "comfortable"],
-    rating: 4.5,
-    reviews: 120,
-    stock: 200,
-    featured: false,
-    createdAt: "2023-03-10T13:45:00Z",
-    updatedAt: "2023-06-05T16:20:00Z"
-  },
-  {
-    id: "5",
-    name: "Slim-Fit Jeans",
-    description: "Modern slim-fit jeans made from quality denim. Perfect for casual and semi-formal occasions with excellent comfort and durability.",
-    price: 4999,
-    discountedPrice: 3999,
-    currency: "₹",
-    images: [
-      "https://images.unsplash.com/photo-1582552938357-32b906df40cb?q=80&w=2080&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?q=80&w=2087&auto=format&fit=crop"
-    ],
-    category: "Clothing",
-    tags: ["jeans", "denim", "slim-fit", "casual"],
     rating: 4.6,
-    reviews: 95,
-    stock: 150,
-    featured: false,
-    createdAt: "2023-02-15T10:20:00Z",
-    updatedAt: "2023-05-01T12:10:00Z"
+    reviews: 92,
+    stock: 35,
+    category: "Fitness",
+    tags: ["yoga", "fitness", "exercise"],
+    images: [
+      "https://images.unsplash.com/photo-1588286840104-8957b019727f?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1603988363607-e1e4a66962c6?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+    ],
+    featured: true
   },
   {
     id: "11",
-    name: "Classic Formal Shirt",
-    description: "Premium cotton formal shirt with crisp collar and perfect fit. Ideal for office wear or formal events with wrinkle-resistant fabric.",
-    price: 3499,
-    discountedPrice: 2999,
+    name: "Adjustable Dumbbell Set",
+    description: "Save space with our adjustable dumbbell set that replaces multiple sets of weights. Perfect for home workouts.",
+    price: usdToInr(199.99),
     currency: "₹",
+    discountedPrice: usdToInr(169.99),
+    rating: 4.8,
+    reviews: 47,
+    stock: 10,
+    category: "Fitness",
+    tags: ["weights", "fitness", "exercise"],
     images: [
-      "https://images.unsplash.com/photo-1598032895397-b9472444bf93?q=80&w=2070&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1563630423918-b58f07336ac5?q=80&w=2087&auto=format&fit=crop"
-    ],
-    category: "Clothing",
-    tags: ["shirt", "formal", "office", "cotton"],
-    rating: 4.7,
-    reviews: 88,
-    stock: 120,
-    featured: false,
-    createdAt: "2023-03-22T09:30:00Z",
-    updatedAt: "2023-07-15T11:45:00Z"
+      "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1580086319619-3ed498161c77?q=80&w=2669&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+    ]
   },
   {
     id: "12",
-    name: "Women's Casual Sundress",
-    description: "Stylish floral print sundress perfect for summer days. Lightweight fabric with adjustable straps and comfortable fit.",
-    price: 3799,
-    discountedPrice: 2999,
+    name: "Handcrafted Wooden Chess Set",
+    description: "A beautiful, handcrafted wooden chess set with meticulously detailed pieces. Perfect for chess enthusiasts.",
+    price: usdToInr(89.99),
     currency: "₹",
-    images: [
-      "https://images.unsplash.com/photo-1612336307429-8a898d10e223?q=80&w=2070&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?q=80&w=2076&auto=format&fit=crop"
-    ],
-    category: "Clothing",
-    tags: ["dress", "women", "summer", "casual"],
-    rating: 4.8,
-    reviews: 156,
-    stock: 75,
-    featured: true,
-    createdAt: "2023-04-05T14:20:00Z",
-    updatedAt: "2023-08-10T10:15:00Z"
-  },
-  
-  // Home & Kitchen Category
-  {
-    id: "6",
-    name: "Stainless Steel Cookware Set",
-    description: "Complete set of professional-grade stainless steel cookware. Includes pots and pans of various sizes with heat-resistant handles and lids.",
-    price: 20999,
-    discountedPrice: 16999,
-    currency: "₹",
-    images: [
-      "https://images.unsplash.com/photo-1584990347449-b88300bd9253?q=80&w=2080&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1585837575652-267c041d77d4?q=80&w=2080&auto=format&fit=crop"
-    ],
-    category: "Home & Kitchen",
-    tags: ["cookware", "kitchen", "stainless-steel", "cooking"],
-    rating: 4.8,
-    reviews: 75,
-    stock: 40,
-    featured: true,
-    createdAt: "2023-01-10T14:30:00Z",
-    updatedAt: "2023-04-30T11:45:00Z"
-  },
-  {
-    id: "7",
-    name: "Smart Home Speaker",
-    description: "Voice-controlled speaker with premium sound quality and smart home integration. Control your music, get answers, and manage your smart home devices.",
-    price: 10999,
-    currency: "₹",
-    images: [
-      "https://images.unsplash.com/photo-1589492477829-5e65395b66cc?q=80&w=2087&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1545454675-3531b543be5d?q=80&w=2080&auto=format&fit=crop"
-    ],
-    category: "Electronics",
-    tags: ["speaker", "smart-home", "voice-control", "audio"],
-    rating: 4.7,
-    reviews: 210,
-    stock: 60,
-    featured: true,
-    createdAt: "2023-01-25T09:40:00Z",
-    updatedAt: "2023-05-15T10:35:00Z"
-  },
-  {
-    id: "13",
-    name: "Modern Coffee Table",
-    description: "Elegant coffee table with minimalist design. Sturdy construction with wooden top and metal legs, perfect for any living room.",
-    price: 14999,
-    discountedPrice: 12999,
-    currency: "₹",
-    images: [
-      "https://images.unsplash.com/photo-1567016376408-0226e4d0c1ea?q=80&w=2070&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?q=80&w=2087&auto=format&fit=crop"
-    ],
-    category: "Home & Kitchen",
-    tags: ["furniture", "table", "living room", "modern"],
-    rating: 4.6,
-    reviews: 65,
-    stock: 25,
-    featured: false,
-    createdAt: "2023-04-15T11:30:00Z",
-    updatedAt: "2023-08-20T09:45:00Z"
-  },
-  {
-    id: "14",
-    name: "Premium Bedding Set",
-    description: "Luxurious 400-thread-count cotton bedding set including duvet cover, fitted sheet, and pillowcases. Soft, comfortable, and durable.",
-    price: 8999,
-    discountedPrice: 7499,
-    currency: "₹",
-    images: [
-      "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?q=80&w=2071&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1584100936595-c0654b55a2e6?q=80&w=2069&auto=format&fit=crop"
-    ],
-    category: "Home & Kitchen",
-    tags: ["bedding", "sheets", "cotton", "bedroom"],
     rating: 4.9,
-    reviews: 112,
-    stock: 50,
-    featured: true,
-    createdAt: "2023-03-10T15:20:00Z",
-    updatedAt: "2023-07-25T13:15:00Z"
-  },
-  
-  // Beauty & Personal Care Category
-  {
-    id: "8",
-    name: "Organic Face Serum",
-    description: "Hydrating face serum made with organic ingredients. Perfect for all skin types, helping to moisturize and rejuvenate your skin naturally.",
-    price: 2999,
-    currency: "₹",
+    reviews: 28,
+    stock: 8,
+    category: "Toys & Games",
+    tags: ["chess", "board game", "handcrafted"],
     images: [
-      "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?q=80&w=1974&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?q=80&w=1974&auto=format&fit=crop"
-    ],
-    category: "Beauty & Personal Care",
-    tags: ["skincare", "organic", "face-serum", "beauty"],
-    rating: 4.6,
-    reviews: 160,
-    stock: 100,
-    featured: false,
-    createdAt: "2023-02-20T15:15:00Z",
-    updatedAt: "2023-06-15T17:30:00Z"
-  },
-  {
-    id: "15",
-    name: "Luxury Bath Set",
-    description: "Complete bath set with bath bombs, essential oils, and premium towels for a spa-like experience at home. Made with all-natural ingredients.",
-    price: 3499,
-    discountedPrice: 2999,
-    currency: "₹",
-    images: [
-      "https://images.unsplash.com/photo-1570194065650-d707c4c1b2be?q=80&w=2070&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1608248597279-f99d160bfcbc?q=80&w=2070&auto=format&fit=crop"
-    ],
-    category: "Beauty & Personal Care",
-    tags: ["bath", "spa", "relaxation", "self-care"],
-    rating: 4.8,
-    reviews: 95,
-    stock: 60,
-    featured: true,
-    createdAt: "2023-05-05T10:45:00Z",
-    updatedAt: "2023-09-01T14:30:00Z"
-  },
-  {
-    id: "16",
-    name: "Hair Care Gift Set",
-    description: "Premium hair care set with shampoo, conditioner, and hair mask. Made with natural ingredients for healthy, shiny hair.",
-    price: 4999,
-    discountedPrice: 3999,
-    currency: "₹",
-    images: [
-      "https://images.unsplash.com/photo-1626710115837-819a6c59f36f?q=80&w=2076&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1610705267928-1b9f2fa7f1c5?q=80&w=2070&auto=format&fit=crop"
-    ],
-    category: "Beauty & Personal Care",
-    tags: ["hair care", "shampoo", "conditioner", "natural"],
-    rating: 4.7,
-    reviews: 78,
-    stock: 40,
-    featured: false,
-    createdAt: "2023-04-20T13:25:00Z",
-    updatedAt: "2023-08-15T11:30:00Z"
+      "https://images.unsplash.com/photo-1586165368502-1bad197a6461?q=80&w=2358&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1529699211952-734e80c4d42b?q=80&w=2671&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+      "https://images.unsplash.com/photo-1580541832626-2a7131ee809f?q=80&w=2651&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+    ]
   }
 ];
+
+// Combine existing products (with INR conversion) and new products
+export const products: Product[] = [...existingProductsInr, ...additionalProducts];

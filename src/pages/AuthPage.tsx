@@ -12,12 +12,24 @@ import { useToast } from "@/components/ui/use-toast";
 import MainLayout from "@/components/layout/MainLayout";
 import { FormControl, FormField, FormItem, Form } from "@/components/ui/form";
 
-const authSchema = z.object({
+const loginSchema = z.object({
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
-type AuthFormValues = z.infer<typeof authSchema>;
+const registerSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  confirmPassword: z.string().min(6, "Password must be at least 6 characters"),
+  firstName: z.string().min(2, "First name must be at least 2 characters"),
+  lastName: z.string().min(2, "Last name must be at least 2 characters"),
+}).refine(data => data.password === data.confirmPassword, {
+  message: "Passwords do not match",
+  path: ["confirmPassword"],
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
+type RegisterFormValues = z.infer<typeof registerSchema>;
 
 const AuthPage = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -25,44 +37,87 @@ const AuthPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const form = useForm<AuthFormValues>({
-    resolver: zodResolver(authSchema),
+  const loginForm = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
 
-  const onSubmit = async (data: AuthFormValues) => {
+  const registerForm = useForm<RegisterFormValues>({
+    resolver: zodResolver(registerSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+      confirmPassword: "",
+      firstName: "",
+      lastName: "",
+    },
+  });
+
+  const onLoginSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
     try {
-      if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({
-          email: data.email,
-          password: data.password,
-        });
-        if (error) throw error;
-        toast({
-          title: "Success!",
-          description: "You have successfully logged in.",
-        });
-        navigate("/");
+      const { error } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      });
+      if (error) throw error;
+      toast({
+        title: "Success!",
+        description: "You have successfully logged in.",
+      });
+      navigate("/");
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to login. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const onRegisterSubmit = async (data: RegisterFormValues) => {
+    setIsLoading(true);
+    try {
+      // Sign up the user
+      const { error: signUpError } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          data: {
+            first_name: data.firstName,
+            last_name: data.lastName,
+          },
+        },
+      });
+      
+      if (signUpError) throw signUpError;
+      
+      toast({
+        title: "Success!",
+        description: "Your account has been created. Please check your email to verify your account.",
+      });
+      
+      // Automatically log in the user after sign up
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
+      });
+      
+      if (signInError) {
+        console.error("Auto login failed:", signInError);
+        setIsLogin(true); // Switch back to login form if auto-login fails
       } else {
-        const { error } = await supabase.auth.signUp({
-          email: data.email,
-          password: data.password,
-        });
-        if (error) throw error;
-        toast({
-          title: "Success!",
-          description: "Please check your email to verify your account.",
-        });
-        setIsLogin(true); // Switch back to login form after successful signup
+        navigate("/");
       }
     } catch (error: any) {
       toast({
         title: "Error",
-        description: error.message,
+        description: error.message || "Failed to create account. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -79,66 +134,209 @@ const AuthPage = () => {
               {isLogin ? "Welcome Back" : "Create Account"}
             </h1>
 
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="email"
-                  render={({ field, fieldState }) => (
-                    <FormItem>
-                      <Label htmlFor="email">Email</Label>
-                      <FormControl>
-                        <Input 
-                          id="email"
-                          type="email"
-                          {...field}
-                          placeholder="Enter your email"
-                        />
-                      </FormControl>
-                      {fieldState.error && (
-                        <p className="text-sm text-red-500">{fieldState.error.message}</p>
-                      )}
-                    </FormItem>
-                  )}
-                />
-
-                <FormField
-                  control={form.control}
-                  name="password"
-                  render={({ field, fieldState }) => (
-                    <FormItem>
-                      <Label htmlFor="password">Password</Label>
-                      <FormControl>
-                        <Input 
-                          id="password"
-                          type="password"
-                          {...field}
-                          placeholder="••••••••"
-                        />
-                      </FormControl>
-                      {fieldState.error && (
-                        <p className="text-sm text-red-500">{fieldState.error.message}</p>
-                      )}
-                    </FormItem>
-                  )}
-                />
-
-                <Button type="submit" className="w-full" disabled={isLoading}>
-                  {isLoading ? "Loading..." : isLogin ? "Sign In" : "Sign Up"}
-                </Button>
-              </form>
-            </Form>
-
-            <div className="mt-4 text-center">
-              <button
-                onClick={() => setIsLogin(!isLogin)}
-                className="text-sm text-brand hover:text-brand-dark"
-              >
-                {isLogin
-                  ? "Don't have an account? Sign up"
-                  : "Already have an account? Sign in"}
-              </button>
+            <div className="mb-6">
+              <div className="flex border-b">
+                <button
+                  className={`px-4 py-2 w-1/2 text-center ${
+                    isLogin ? "border-b-2 border-brand font-medium text-brand" : "text-gray-500"
+                  }`}
+                  onClick={() => setIsLogin(true)}
+                >
+                  Login
+                </button>
+                <button
+                  className={`px-4 py-2 w-1/2 text-center ${
+                    !isLogin ? "border-b-2 border-brand font-medium text-brand" : "text-gray-500"
+                  }`}
+                  onClick={() => setIsLogin(false)}
+                >
+                  Register
+                </button>
+              </div>
             </div>
+
+            {isLogin ? (
+              <Form {...loginForm}>
+                <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
+                  <FormField
+                    control={loginForm.control}
+                    name="email"
+                    render={({ field, fieldState }) => (
+                      <FormItem>
+                        <Label htmlFor="login-email">Email</Label>
+                        <FormControl>
+                          <Input 
+                            id="login-email"
+                            type="email"
+                            {...field}
+                            placeholder="Enter your email"
+                          />
+                        </FormControl>
+                        {fieldState.error && (
+                          <p className="text-sm text-red-500">{fieldState.error.message}</p>
+                        )}
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={loginForm.control}
+                    name="password"
+                    render={({ field, fieldState }) => (
+                      <FormItem>
+                        <Label htmlFor="login-password">Password</Label>
+                        <FormControl>
+                          <Input 
+                            id="login-password"
+                            type="password"
+                            {...field}
+                            placeholder="••••••••"
+                          />
+                        </FormControl>
+                        {fieldState.error && (
+                          <p className="text-sm text-red-500">{fieldState.error.message}</p>
+                        )}
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="text-right">
+                    <a href="#" className="text-sm text-brand hover:underline">
+                      Forgot password?
+                    </a>
+                  </div>
+
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? "Loading..." : "Sign In"}
+                  </Button>
+                </form>
+              </Form>
+            ) : (
+              <Form {...registerForm}>
+                <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <FormField
+                      control={registerForm.control}
+                      name="firstName"
+                      render={({ field, fieldState }) => (
+                        <FormItem>
+                          <Label htmlFor="first-name">First Name</Label>
+                          <FormControl>
+                            <Input 
+                              id="first-name"
+                              {...field}
+                              placeholder="First name"
+                            />
+                          </FormControl>
+                          {fieldState.error && (
+                            <p className="text-sm text-red-500">{fieldState.error.message}</p>
+                          )}
+                        </FormItem>
+                      )}
+                    />
+
+                    <FormField
+                      control={registerForm.control}
+                      name="lastName"
+                      render={({ field, fieldState }) => (
+                        <FormItem>
+                          <Label htmlFor="last-name">Last Name</Label>
+                          <FormControl>
+                            <Input 
+                              id="last-name"
+                              {...field}
+                              placeholder="Last name"
+                            />
+                          </FormControl>
+                          {fieldState.error && (
+                            <p className="text-sm text-red-500">{fieldState.error.message}</p>
+                          )}
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  <FormField
+                    control={registerForm.control}
+                    name="email"
+                    render={({ field, fieldState }) => (
+                      <FormItem>
+                        <Label htmlFor="register-email">Email</Label>
+                        <FormControl>
+                          <Input 
+                            id="register-email"
+                            type="email"
+                            {...field}
+                            placeholder="Enter your email"
+                          />
+                        </FormControl>
+                        {fieldState.error && (
+                          <p className="text-sm text-red-500">{fieldState.error.message}</p>
+                        )}
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={registerForm.control}
+                    name="password"
+                    render={({ field, fieldState }) => (
+                      <FormItem>
+                        <Label htmlFor="register-password">Password</Label>
+                        <FormControl>
+                          <Input 
+                            id="register-password"
+                            type="password"
+                            {...field}
+                            placeholder="••••••••"
+                          />
+                        </FormControl>
+                        {fieldState.error && (
+                          <p className="text-sm text-red-500">{fieldState.error.message}</p>
+                        )}
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={registerForm.control}
+                    name="confirmPassword"
+                    render={({ field, fieldState }) => (
+                      <FormItem>
+                        <Label htmlFor="confirm-password">Confirm Password</Label>
+                        <FormControl>
+                          <Input 
+                            id="confirm-password"
+                            type="password"
+                            {...field}
+                            placeholder="••••••••"
+                          />
+                        </FormControl>
+                        {fieldState.error && (
+                          <p className="text-sm text-red-500">{fieldState.error.message}</p>
+                        )}
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="text-sm text-gray-600">
+                    By registering, you agree to our{" "}
+                    <a href="#" className="text-brand hover:underline">
+                      Terms of Service
+                    </a>{" "}
+                    and{" "}
+                    <a href="#" className="text-brand hover:underline">
+                      Privacy Policy
+                    </a>
+                    .
+                  </div>
+
+                  <Button type="submit" className="w-full" disabled={isLoading}>
+                    {isLoading ? "Creating Account..." : "Create Account"}
+                  </Button>
+                </form>
+              </Form>
+            )}
           </div>
         </div>
       </div>
