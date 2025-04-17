@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuth } from "@/context/AuthContext";
 import { useCart } from "@/context/CartContext";
+import { useToast } from "@/components/ui/use-toast";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -16,6 +17,7 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { items } = useCart();
+  const { toast } = useToast();
   
   const cartItemCount = items?.length || 0;
 
@@ -28,6 +30,24 @@ const Navbar = () => {
     if (searchQuery.trim()) {
       navigate(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
       setSearchQuery("");
+      toast({
+        title: "Searching",
+        description: `Finding results for "${searchQuery}"`,
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: "Please enter a search term",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleAccountClick = () => {
+    if (user) {
+      navigate("/account");
+    } else {
+      navigate("/auth");
     }
   };
 
@@ -85,9 +105,9 @@ const Navbar = () => {
             )}
           </Link>
 
-          <Link to={user ? "/account" : "/login"}>
+          <button onClick={handleAccountClick}>
             <User className="h-5 w-5 text-gray-700" />
-          </Link>
+          </button>
 
           {/* Mobile menu toggle */}
           {isMobile && (

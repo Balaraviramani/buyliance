@@ -42,6 +42,10 @@ const AuthPage = () => {
           password: data.password,
         });
         if (error) throw error;
+        toast({
+          title: "Success!",
+          description: "You have successfully logged in.",
+        });
         navigate("/");
       } else {
         const { error } = await supabase.auth.signUp({
@@ -53,6 +57,7 @@ const AuthPage = () => {
           title: "Success!",
           description: "Please check your email to verify your account.",
         });
+        setIsLogin(true); // Switch back to login form after successful signup
       }
     } catch (error: any) {
       toast({

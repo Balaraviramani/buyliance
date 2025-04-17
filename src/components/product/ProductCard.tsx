@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
+import { useToast } from "@/components/ui/use-toast";
 
 interface ProductCardProps {
   product: Product;
@@ -14,6 +15,7 @@ interface ProductCardProps {
 
 const ProductCard = ({ product, variant = "default" }: ProductCardProps) => {
   const { addItem } = useCart();
+  const { toast } = useToast();
   const [isHovered, setIsHovered] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
 
@@ -21,12 +23,22 @@ const ProductCard = ({ product, variant = "default" }: ProductCardProps) => {
     e.preventDefault();
     e.stopPropagation();
     addItem(product);
+    toast({
+      title: "Added to cart",
+      description: `${product.name} has been added to your cart.`,
+    });
   };
 
   const handleToggleFavorite = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsFavorite(!isFavorite);
+    toast({
+      title: isFavorite ? "Removed from favorites" : "Added to favorites",
+      description: isFavorite 
+        ? `${product.name} has been removed from your favorites.`
+        : `${product.name} has been added to your favorites.`,
+    });
   };
 
   // Calculate discount percentage
@@ -102,11 +114,11 @@ const ProductCard = ({ product, variant = "default" }: ProductCardProps) => {
         <div className="mt-2 flex items-center gap-1">
           {product.discountedPrice ? (
             <>
-              <span className="font-medium text-gray-900">${product.discountedPrice}</span>
-              <span className="text-sm text-gray-500 line-through">${product.price}</span>
+              <span className="font-medium text-gray-900">{product.currency}{product.discountedPrice.toLocaleString('en-IN')}</span>
+              <span className="text-sm text-gray-500 line-through">{product.currency}{product.price.toLocaleString('en-IN')}</span>
             </>
           ) : (
-            <span className="font-medium text-gray-900">${product.price}</span>
+            <span className="font-medium text-gray-900">{product.currency}{product.price.toLocaleString('en-IN')}</span>
           )}
         </div>
 

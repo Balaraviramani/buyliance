@@ -9,14 +9,16 @@ import { Button } from "@/components/ui/button";
 import { SlidersHorizontal, Grid, Grid2X2, List } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Product } from "@/types";
+import { useToast } from "@/components/ui/use-toast";
 
 const ShopPage = () => {
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [filteredProducts, setFilteredProducts] = useState<Product[]>(products);
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "compact" | "list">("grid");
-  const [sortBy, setSortBy] = useState<string>("featured");
+  const [sortBy, setSortBy] = useState<string>(searchParams.get('sort') || "featured");
   const isMobile = useIsMobile();
+  const { toast } = useToast();
 
   // Filter and sort products based on search params and sort selection
   useEffect(() => {
@@ -32,6 +34,26 @@ const ShopPage = () => {
           product.description.toLowerCase().includes(query) ||
           product.category.toLowerCase().includes(query)
       );
+    }
+
+    // Apply category filter if present
+    const categoryFilter = searchParams.get('category');
+    if (categoryFilter) {
+      result = result.filter(
+        product => product.category.toLowerCase() === categoryFilter.toLowerCase()
+      );
+    }
+
+    // Apply featured filter if present
+    const featuredFilter = searchParams.get('featured');
+    if (featuredFilter === 'true') {
+      result = result.filter(product => product.featured);
+    }
+
+    // Apply discount filter if present
+    const discountFilter = searchParams.get('discount');
+    if (discountFilter === 'true') {
+      result = result.filter(product => product.discountedPrice !== undefined);
     }
     
     // Apply sort
@@ -62,18 +84,33 @@ const ShopPage = () => {
     setFilteredProducts(result);
   }, [searchParams, sortBy]);
 
-  // Convert prices from USD to INR (using approximate conversion rate)
-  const convertedProducts = filteredProducts.map(product => {
-    const inrPrice = Math.round(product.price * 83); // Approximate INR conversion
-    const inrDiscountedPrice = product.discountedPrice ? Math.round(product.discountedPrice * 83) : undefined;
+  const handleSortChange = (value: string) => {
+    setSortBy(value);
+    const newSearchParams = new URLSearchParams(searchParams.toString());
+    newSearchParams.set('sort', value);
+    setSearchParams(newSearchParams);
     
-    return {
-      ...product,
-      price: inrPrice,
-      discountedPrice: inrDiscountedPrice,
-      currency: "₹"
-    };
-  });
+    toast({
+      title: "Sort Applied",
+      description: `Products sorted by ${value.replace(/-/g, ' ')}`,
+    });
+  };
+
+  const handleViewModeChange = (mode: "grid" | "compact" | "list") => {
+    setViewMode(mode);
+    toast({
+      title: "View Changed",
+      description: `Changed to ${mode} view`,
+    });
+  };
+
+  const handleFilterToggle = () => {
+    setShowFilters(!showFilters);
+    toast({
+      title: showFilters ? "Filters Hidden" : "Filters Shown",
+      description: showFilters ? "Product filters are now hidden" : "Product filters are now visible",
+    });
+  };
 
   return (
     <MainLayout>
@@ -94,7 +131,7 @@ const ShopPage = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
           <div>
             <p className="text-sm text-gray-500">
-              Showing <span className="font-medium">{convertedProducts.length}</span> products
+              Showing <span className="font-medium">{filteredProducts.length}</span> products
             </p>
           </div>
           
@@ -104,7 +141,7 @@ const ShopPage = () => {
                 variant="outline" 
                 size="sm" 
                 className="flex items-center gap-2"
-                onClick={() => setShowFilters(!showFilters)}
+                onClick={handleFilterToggle}
               >
                 <SlidersHorizontal className="h-4 w-4" />
                 {showFilters ? "Hide Filters" : "Show Filters"}
@@ -116,7 +153,7 @@ const ShopPage = () => {
                 variant="ghost" 
                 size="sm" 
                 className={`px-3 py-1 rounded-none ${viewMode === 'grid' ? 'bg-gray-100' : ''}`}
-                onClick={() => setViewMode("grid")}
+                onClick={() => handleViewModeChange("grid")}
               >
                 <Grid2X2 className="h-4 w-4" />
               </Button>
@@ -124,7 +161,7 @@ const ShopPage = () => {
                 variant="ghost" 
                 size="sm" 
                 className={`px-3 py-1 rounded-none ${viewMode === 'compact' ? 'bg-gray-100' : ''}`}
-                onClick={() => setViewMode("compact")}
+                onClick={() => handleViewModeChange("compact")}
               >
                 <Grid className="h-4 w-4" />
               </Button>
@@ -132,7 +169,7 @@ const ShopPage = () => {
                 variant="ghost" 
                 size="sm" 
                 className={`px-3 py-1 rounded-none ${viewMode === 'list' ? 'bg-gray-100' : ''}`}
-                onClick={() => setViewMode("list")}
+                onClick={() => handleViewModeChange("list")}
               >
                 <List className="h-4 w-4" />
               </Button>
@@ -141,7 +178,7 @@ const ShopPage = () => {
             <select 
               className="text-sm border rounded-md px-3 py-1.5"
               value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
+              onChange={(e) => handleSortChange(e.target.value)}
             >
               <option value="featured">Sort by: Featured</option>
               <option value="price-low-high">Price: Low to High</option>
@@ -163,7 +200,7 @@ const ShopPage = () => {
           {/* Product Grid */}
           <div className="flex-1">
             <ProductGrid 
-              products={convertedProducts} 
+              products={filteredProducts} 
               columns={viewMode === "list" ? 1 : 4} 
               variant={viewMode === "compact" ? "compact" : "default"} 
             />
