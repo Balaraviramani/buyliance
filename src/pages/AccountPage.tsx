@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { UserCircle, Package, Heart, LogOut } from "lucide-react";
 import { useState, useEffect } from "react";
+import { toast } from "sonner";
 
 // Define a type for user profile data
 interface UserProfile {
@@ -24,25 +25,58 @@ const AccountPage = () => {
   useEffect(() => {
     // Extract user metadata or use defaults
     if (user) {
-      // Try to get profile data from user metadata or localStorage
-      const firstName = user.user_metadata?.first_name || localStorage.getItem('firstName') || "Guest";
-      const lastName = user.user_metadata?.last_name || localStorage.getItem('lastName') || "User";
-      
-      setProfile({
-        firstName,
-        lastName
-      });
+      try {
+        // Try to get profile data from user metadata or localStorage
+        const userMeta = user.user_metadata || {};
+        const firstName = userMeta.first_name || localStorage.getItem('firstName') || "Guest";
+        const lastName = userMeta.last_name || localStorage.getItem('lastName') || "User";
+        
+        setProfile({
+          firstName,
+          lastName
+        });
+      } catch (error) {
+        console.error("Error getting user profile data:", error);
+        // Fallback to defaults
+        setProfile({
+          firstName: "Guest",
+          lastName: "User"
+        });
+      }
     }
   }, [user]);
 
+  useEffect(() => {
+    if (!user) {
+      navigate("/login");
+    }
+  }, [user, navigate]);
+
   if (!user) {
-    navigate("/login");
     return null;
   }
 
   const handleSignOut = async () => {
-    await signOut();
-    navigate("/");
+    try {
+      await signOut();
+      toast.success("Signed out successfully");
+      navigate("/");
+    } catch (error) {
+      console.error("Error signing out:", error);
+      toast.error("Failed to sign out. Please try again.");
+    }
+  };
+
+  const handleEditProfile = () => {
+    toast.info("Profile editing will be available soon!");
+  };
+
+  const handleViewOrders = () => {
+    toast.info("Orders feature will be available soon!");
+  };
+
+  const handleViewWishlist = () => {
+    toast.info("Wishlist feature will be available soon!");
   };
 
   return (
@@ -67,7 +101,7 @@ const AccountPage = () => {
               </div>
             </CardContent>
             <CardFooter>
-              <Button variant="outline" size="sm">Edit Profile</Button>
+              <Button variant="outline" size="sm" onClick={handleEditProfile}>Edit Profile</Button>
             </CardFooter>
           </Card>
 
@@ -86,7 +120,7 @@ const AccountPage = () => {
               </p>
             </CardContent>
             <CardFooter>
-              <Button variant="outline" size="sm">View Orders</Button>
+              <Button variant="outline" size="sm" onClick={handleViewOrders}>View Orders</Button>
             </CardFooter>
           </Card>
 
@@ -105,7 +139,7 @@ const AccountPage = () => {
               </p>
             </CardContent>
             <CardFooter>
-              <Button variant="outline" size="sm">View Wishlist</Button>
+              <Button variant="outline" size="sm" onClick={handleViewWishlist}>View Wishlist</Button>
             </CardFooter>
           </Card>
         </div>

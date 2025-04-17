@@ -1,20 +1,34 @@
 
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Menu, X, ShoppingCart, User, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useAuth } from "@/context/AuthContext";
+import { useCart } from "@/context/CartContext";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const isMobile = useIsMobile();
-  // This would be connected to a cart context in a full implementation
-  const cartItemCount = 0;
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { items } = useCart();
+  
+  const cartItemCount = items?.length || 0;
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/shop?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery("");
+    }
   };
 
   const navLinks = [
@@ -51,13 +65,15 @@ const Navbar = () => {
         {/* Search, Cart and Account - always visible */}
         <div className="flex items-center space-x-4">
           {!isMobile && (
-            <div className="relative w-40 md:w-64">
+            <form onSubmit={handleSearch} className="relative w-40 md:w-64">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
               <Input 
                 placeholder="Search..." 
                 className="pl-8 h-9" 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
-            </div>
+            </form>
           )}
 
           <Link to="/cart" className="relative">
@@ -69,7 +85,7 @@ const Navbar = () => {
             )}
           </Link>
 
-          <Link to="/account">
+          <Link to={user ? "/account" : "/login"}>
             <User className="h-5 w-5 text-gray-700" />
           </Link>
 
@@ -90,13 +106,15 @@ const Navbar = () => {
       {isMobile && isMenuOpen && (
         <div className="absolute w-full bg-white border-b border-gray-200 shadow-lg py-4">
           <div className="container mx-auto px-4 flex flex-col space-y-4">
-            <div className="relative w-full mb-2">
+            <form onSubmit={handleSearch} className="relative w-full mb-2">
               <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-500" />
               <Input 
                 placeholder="Search..." 
                 className="pl-8 h-9 w-full" 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
               />
-            </div>
+            </form>
             {navLinks.map((link) => (
               <Link
                 key={link.name}

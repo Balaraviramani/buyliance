@@ -1,5 +1,6 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import MainLayout from "@/components/layout/MainLayout";
 import { products } from "@/data/products";
 import ProductGrid from "@/components/product/ProductGrid";
@@ -7,12 +8,72 @@ import { ProductFilters } from "@/components/ui/product-filters";
 import { Button } from "@/components/ui/button";
 import { SlidersHorizontal, Grid, Grid2X2, List } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Product } from "@/types";
 
 const ShopPage = () => {
-  const [filteredProducts, setFilteredProducts] = useState(products);
+  const [searchParams] = useSearchParams();
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>(products);
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState<"grid" | "compact" | "list">("grid");
+  const [sortBy, setSortBy] = useState<string>("featured");
   const isMobile = useIsMobile();
+
+  // Filter and sort products based on search params and sort selection
+  useEffect(() => {
+    let result = [...products];
+    
+    // Apply search filter if present
+    const searchQuery = searchParams.get('search');
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(
+        product => 
+          product.name.toLowerCase().includes(query) || 
+          product.description.toLowerCase().includes(query) ||
+          product.category.toLowerCase().includes(query)
+      );
+    }
+    
+    // Apply sort
+    switch (sortBy) {
+      case 'price-low-high':
+        result.sort((a, b) => a.price - b.price);
+        break;
+      case 'price-high-low':
+        result.sort((a, b) => b.price - a.price);
+        break;
+      case 'rating':
+        result.sort((a, b) => b.rating - a.rating);
+        break;
+      case 'newest':
+        result.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        break;
+      case 'featured':
+      default:
+        // Featured products first, then sort by rating
+        result.sort((a, b) => {
+          if (a.featured && !b.featured) return -1;
+          if (!a.featured && b.featured) return 1;
+          return b.rating - a.rating;
+        });
+        break;
+    }
+    
+    setFilteredProducts(result);
+  }, [searchParams, sortBy]);
+
+  // Convert prices from USD to INR (using approximate conversion rate)
+  const convertedProducts = filteredProducts.map(product => {
+    const inrPrice = Math.round(product.price * 83); // Approximate INR conversion
+    const inrDiscountedPrice = product.discountedPrice ? Math.round(product.discountedPrice * 83) : undefined;
+    
+    return {
+      ...product,
+      price: inrPrice,
+      discountedPrice: inrDiscountedPrice,
+      currency: "₹"
+    };
+  });
 
   return (
     <MainLayout>
@@ -33,7 +94,7 @@ const ShopPage = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
           <div>
             <p className="text-sm text-gray-500">
-              Showing <span className="font-medium">{filteredProducts.length}</span> products
+              Showing <span className="font-medium">{convertedProducts.length}</span> products
             </p>
           </div>
           
@@ -77,12 +138,16 @@ const ShopPage = () => {
               </Button>
             </div>
 
-            <select className="text-sm border rounded-md px-3 py-1.5">
-              <option>Sort by: Featured</option>
-              <option>Price: Low to High</option>
-              <option>Price: High to Low</option>
-              <option>Best Rating</option>
-              <option>Newest</option>
+            <select 
+              className="text-sm border rounded-md px-3 py-1.5"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+            >
+              <option value="featured">Sort by: Featured</option>
+              <option value="price-low-high">Price: Low to High</option>
+              <option value="price-high-low">Price: High to Low</option>
+              <option value="rating">Best Rating</option>
+              <option value="newest">Newest</option>
             </select>
           </div>
         </div>
@@ -98,7 +163,7 @@ const ShopPage = () => {
           {/* Product Grid */}
           <div className="flex-1">
             <ProductGrid 
-              products={filteredProducts} 
+              products={convertedProducts} 
               columns={viewMode === "list" ? 1 : 4} 
               variant={viewMode === "compact" ? "compact" : "default"} 
             />
