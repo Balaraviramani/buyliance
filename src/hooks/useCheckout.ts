@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/context/CartContext";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +9,7 @@ export const useCheckout = () => {
   const { items, subtotal, clearCart } = useCart();
   const [paymentMethod, setPaymentMethod] = useState("creditCard");
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -35,6 +35,15 @@ export const useCheckout = () => {
   
   // Total cost
   const total = subtotal + shippingCost + tax;
+
+  // Simulate loading of checkout data
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1500);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
@@ -109,7 +118,6 @@ export const useCheckout = () => {
         return false;
       }
 
-      // Simple card validation
       if (formData.cardNumber.replace(/\s/g, "").length !== 16) {
         toast({
           title: "Error",
@@ -128,14 +136,12 @@ export const useCheckout = () => {
     
     if (!validateForm()) return;
     
-    // Process the order
     setIsProcessing(true);
 
     setTimeout(() => {
       setIsProcessing(false);
       clearCart();
       
-      // Generate a random order ID and store it in localStorage
       const orderId = "ORD-" + Math.random().toString(36).substring(2, 10).toUpperCase();
       localStorage.setItem("lastOrderId", orderId);
       localStorage.setItem("orderDetails", JSON.stringify({
@@ -157,6 +163,7 @@ export const useCheckout = () => {
     paymentMethod,
     setPaymentMethod,
     isProcessing,
+    isLoading,
     shippingCost,
     tax,
     total,

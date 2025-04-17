@@ -3,6 +3,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { CartItem } from "@/types";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface OrderSummaryProps {
   items: CartItem[];
@@ -11,6 +12,7 @@ interface OrderSummaryProps {
   tax: number;
   total: number;
   isProcessing: boolean;
+  isLoading?: boolean;
 }
 
 const OrderSummary: React.FC<OrderSummaryProps> = ({
@@ -20,7 +22,51 @@ const OrderSummary: React.FC<OrderSummaryProps> = ({
   tax,
   total,
   isProcessing,
+  isLoading = false,
 }) => {
+  if (isLoading) {
+    return (
+      <div className="bg-white rounded-lg shadow-sm p-6 sticky top-4">
+        <Skeleton className="h-6 w-48 mb-6" />
+        
+        <div className="max-h-60 mb-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="flex items-center py-3 border-b">
+              <Skeleton className="w-12 h-12 rounded-md" />
+              <div className="ml-4 flex-1">
+                <Skeleton className="h-4 w-3/4 mb-2" />
+                <Skeleton className="h-3 w-1/4" />
+              </div>
+              <Skeleton className="h-4 w-16" />
+            </div>
+          ))}
+        </div>
+        
+        <div className="space-y-3 mb-6">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="flex justify-between items-center">
+              <Skeleton className="h-4 w-24" />
+              <Skeleton className="h-4 w-16" />
+            </div>
+          ))}
+          
+          <Separator className="my-2" />
+          
+          <div className="flex justify-between items-center pt-2">
+            <Skeleton className="h-5 w-20" />
+            <Skeleton className="h-5 w-24" />
+          </div>
+        </div>
+        
+        <Skeleton className="h-10 w-full" />
+        
+        <div className="mt-4 text-center">
+          <Skeleton className="h-3 w-3/4 mx-auto" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 sticky top-4">
       <h2 className="text-xl font-bold mb-4">Order Summary</h2>
