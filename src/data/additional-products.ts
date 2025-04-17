@@ -1,6 +1,12 @@
 
 import { Product } from "@/types";
 
+// Get today's date and a date from 6 months ago
+const today = new Date().toISOString();
+const sixMonthsAgo = new Date();
+sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+const sixMonthsAgoStr = sixMonthsAgo.toISOString();
+
 export const additionalProducts: Product[] = [
   // Home & Kitchen products
   {
@@ -20,7 +26,9 @@ export const additionalProducts: Product[] = [
       "https://images.unsplash.com/photo-1566454825481-9c31bd88c6c4?q=80&w=1443&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1590794056226-79ef3a8147e1?q=80&w=1471&auto=format&fit=crop"
     ],
-    featured: true
+    featured: true,
+    createdAt: sixMonthsAgoStr,
+    updatedAt: today
   },
   {
     id: "hk-002",
@@ -38,7 +46,9 @@ export const additionalProducts: Product[] = [
       "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?q=80&w=1470&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1601944179066-29786cb9d32a?q=80&w=1470&auto=format&fit=crop"
     ],
-    featured: true
+    featured: true,
+    createdAt: sixMonthsAgoStr,
+    updatedAt: today
   },
   {
     id: "hk-003",
@@ -55,7 +65,10 @@ export const additionalProducts: Product[] = [
     images: [
       "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?q=80&w=1470&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1493663284031-b7e3aefcae8e?q=80&w=1470&auto=format&fit=crop"
-    ]
+    ],
+    featured: false,
+    createdAt: sixMonthsAgoStr,
+    updatedAt: today
   },
   {
     id: "hk-004",
@@ -72,7 +85,10 @@ export const additionalProducts: Product[] = [
     images: [
       "https://images.unsplash.com/photo-1604335399105-a0c585fd81a1?q=80&w=1470&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1626806787461-102c1bfaaea1?q=80&w=1471&auto=format&fit=crop"
-    ]
+    ],
+    featured: false,
+    createdAt: sixMonthsAgoStr,
+    updatedAt: today
   },
   {
     id: "hk-005",
@@ -89,7 +105,10 @@ export const additionalProducts: Product[] = [
     images: [
       "https://images.unsplash.com/photo-1574269909862-7e1d70bb8078?q=80&w=1341&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1585659722983-3a681d258a03?q=80&w=1470&auto=format&fit=crop"
-    ]
+    ],
+    featured: false,
+    createdAt: sixMonthsAgoStr,
+    updatedAt: today
   },
   {
     id: "hk-006",
@@ -106,7 +125,10 @@ export const additionalProducts: Product[] = [
     images: [
       "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?q=80&w=1471&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1583244685026-d8519b5e3d21?q=80&w=1469&auto=format&fit=crop"
-    ]
+    ],
+    featured: false,
+    createdAt: sixMonthsAgoStr,
+    updatedAt: today
   },
   {
     id: "hk-007",
@@ -123,7 +145,10 @@ export const additionalProducts: Product[] = [
     images: [
       "https://images.unsplash.com/photo-1626251376234-4d150b11c43b?q=80&w=1528&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1577554105754-602c7bc6adee?q=80&w=1464&auto=format&fit=crop"
-    ]
+    ],
+    featured: false,
+    createdAt: sixMonthsAgoStr,
+    updatedAt: today
   },
   {
     id: "hk-008",
@@ -140,7 +165,10 @@ export const additionalProducts: Product[] = [
     images: [
       "https://images.unsplash.com/photo-1588594562079-ef1e6ca5e17d?q=80&w=1470&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1631787244701-16af1906b879?q=80&w=1342&auto=format&fit=crop"
-    ]
+    ],
+    featured: false,
+    createdAt: sixMonthsAgoStr,
+    updatedAt: today
   },
   
   // Beauty & Personal Care products
@@ -160,7 +188,9 @@ export const additionalProducts: Product[] = [
       "https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?q=80&w=1470&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1611080626919-7cf5a9dbab5b?q=80&w=1470&auto=format&fit=crop"
     ],
-    featured: true
+    featured: true,
+    createdAt: sixMonthsAgoStr,
+    updatedAt: today
   },
   {
     id: "bp-002",
@@ -177,7 +207,10 @@ export const additionalProducts: Product[] = [
     images: [
       "https://images.unsplash.com/photo-1522338242992-e1a54906a8da?q=80&w=1288&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1571875257727-256c39da42af?q=80&w=1780&auto=format&fit=crop"
-    ]
+    ],
+    featured: false,
+    createdAt: sixMonthsAgoStr,
+    updatedAt: today
   },
   {
     id: "bp-003",
@@ -195,7 +228,9 @@ export const additionalProducts: Product[] = [
       "https://images.unsplash.com/photo-1619228963553-91f3bd3d1448?q=80&w=1470&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1608248597279-f99d160bfcbc?q=80&w=1374&auto=format&fit=crop"
     ],
-    featured: true
+    featured: true,
+    createdAt: sixMonthsAgoStr,
+    updatedAt: today
   },
   {
     id: "bp-004",
@@ -212,7 +247,10 @@ export const additionalProducts: Product[] = [
     images: [
       "https://images.unsplash.com/photo-1596462502278-27bfdc403348?q=80&w=1480&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1579154204601-01588f351e67?q=80&w=1470&auto=format&fit=crop"
-    ]
+    ],
+    featured: false,
+    createdAt: sixMonthsAgoStr,
+    updatedAt: today
   },
   {
     id: "bp-005",
@@ -229,7 +267,10 @@ export const additionalProducts: Product[] = [
     images: [
       "https://images.unsplash.com/photo-1589782182349-0e6b7eceec55?q=80&w=1374&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1621607512214-68297480165e?q=80&w=1374&auto=format&fit=crop"
-    ]
+    ],
+    featured: false,
+    createdAt: sixMonthsAgoStr,
+    updatedAt: today
   },
   {
     id: "bp-006",
@@ -246,7 +287,10 @@ export const additionalProducts: Product[] = [
     images: [
       "https://images.unsplash.com/photo-1596755389378-c31d21fd1273?q=80&w=1470&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1571875257727-256c39da42af?q=80&w=1780&auto=format&fit=crop"
-    ]
+    ],
+    featured: false,
+    createdAt: sixMonthsAgoStr,
+    updatedAt: today
   },
   {
     id: "bp-007",
@@ -263,7 +307,10 @@ export const additionalProducts: Product[] = [
     images: [
       "https://images.unsplash.com/photo-1541643600914-78b084683601?q=80&w=1548&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1588405748880-12d1d2a59f75?q=80&w=1470&auto=format&fit=crop"
-    ]
+    ],
+    featured: false,
+    createdAt: sixMonthsAgoStr,
+    updatedAt: today
   },
   {
     id: "bp-008",
@@ -280,6 +327,9 @@ export const additionalProducts: Product[] = [
     images: [
       "https://images.unsplash.com/photo-1626735531430-c76599fe8909?q=80&w=1374&auto=format&fit=crop",
       "https://images.unsplash.com/photo-1643167409188-3c89847eb168?q=80&w=1374&auto=format&fit=crop"
-    ]
+    ],
+    featured: false,
+    createdAt: sixMonthsAgoStr,
+    updatedAt: today
   }
 ];

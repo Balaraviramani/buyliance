@@ -1,10 +1,69 @@
-import { Product } from "@/types";
+import { Product, Category } from "@/types";
 import { additionalProducts } from "./additional-products";
 
 // Convert USD to INR (assuming 1 USD = 83 INR)
 const usdToInr = (price?: number) => price ? Math.round(price * 83) : undefined;
 
-// Existing products with INR conversion
+// Define categories that can be used across the application
+export const categories: Category[] = [
+  {
+    id: "electronics",
+    name: "Electronics",
+    description: "The latest gadgets and tech innovations",
+    image: "https://images.unsplash.com/photo-1550009158-9ebf69173e03?q=80&w=2301&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    slug: "electronics"
+  },
+  {
+    id: "fashion",
+    name: "Fashion",
+    description: "Trendy clothing and accessories",
+    image: "https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=2671&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    slug: "fashion"
+  },
+  {
+    id: "home-decor",
+    name: "Home Decor",
+    description: "Beautify your living space",
+    image: "https://images.unsplash.com/photo-1583847268964-b28dc8f51f92?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    slug: "home-decor"
+  },
+  {
+    id: "fitness",
+    name: "Fitness",
+    description: "Equipment and gear for your workout",
+    image: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    slug: "fitness"
+  },
+  {
+    id: "toys-games",
+    name: "Toys & Games",
+    description: "Fun for all ages",
+    image: "https://images.unsplash.com/photo-1558060370-d644479cb6f7?q=80&w=2672&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    slug: "toys-games"
+  },
+  {
+    id: "home-kitchen",
+    name: "Home & Kitchen",
+    description: "Essential appliances and decor for your home",
+    image: "https://images.unsplash.com/photo-1556911220-bff31c812dba?q=80&w=2568&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    slug: "home-kitchen"
+  },
+  {
+    id: "beauty-personal-care",
+    name: "Beauty & Personal Care",
+    description: "Products to enhance your natural beauty",
+    image: "https://images.unsplash.com/photo-1571875257727-256c39da42af?q=80&w=1780&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+    slug: "beauty-personal-care"
+  }
+];
+
+// Get today's date and a date from 6 months ago
+const today = new Date().toISOString();
+const sixMonthsAgo = new Date();
+sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+const sixMonthsAgoStr = sixMonthsAgo.toISOString();
+
+// Existing products with INR conversion and added required fields
 const existingProductsInr: Product[] = [
   {
     id: "1",
@@ -23,7 +82,9 @@ const existingProductsInr: Product[] = [
       "https://images.unsplash.com/photo-1616424525073-d5532ee6afb2?q=80&w=2664&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "https://images.unsplash.com/photo-1625873526852-381ab99fd305?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
     ],
-    featured: true
+    featured: true,
+    createdAt: sixMonthsAgoStr,
+    updatedAt: today
   },
   {
     id: "2",
@@ -41,7 +102,9 @@ const existingProductsInr: Product[] = [
       "https://images.unsplash.com/photo-1546868871-7041f2a55e12?q=80&w=2428&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "https://images.unsplash.com/photo-1617043786394-f977fa12eddf?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
     ],
-    featured: true
+    featured: true,
+    createdAt: sixMonthsAgoStr,
+    updatedAt: today
   },
   {
     id: "3",
@@ -58,7 +121,10 @@ const existingProductsInr: Product[] = [
       "https://images.unsplash.com/photo-1502920917128-1aa500764cbd?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "https://images.unsplash.com/photo-1516724562728-afc824a36e84?q=80&w=2651&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "https://images.unsplash.com/photo-1480365501497-199581be0e66?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-    ]
+    ],
+    featured: false,
+    createdAt: sixMonthsAgoStr,
+    updatedAt: today
   },
   {
     id: "4",
@@ -74,7 +140,10 @@ const existingProductsInr: Product[] = [
     images: [
       "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?q=80&w=2579&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-    ]
+    ],
+    featured: false,
+    createdAt: sixMonthsAgoStr,
+    updatedAt: today
   },
   {
     id: "5",
@@ -93,7 +162,9 @@ const existingProductsInr: Product[] = [
       "https://images.unsplash.com/photo-1596755094514-f87e34085b2c?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "https://images.unsplash.com/photo-1503341504253-dff4815485f1?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
     ],
-    featured: true
+    featured: true,
+    createdAt: sixMonthsAgoStr,
+    updatedAt: today
   },
   {
     id: "6",
@@ -111,7 +182,10 @@ const existingProductsInr: Product[] = [
       "https://images.unsplash.com/photo-1511499767150-a48a237f0083?q=80&w=2580&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "https://images.unsplash.com/photo-1473496169904-658ba7c44d8a?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "https://images.unsplash.com/photo-1534118007900-95c82793a121?q=80&w=2302&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-    ]
+    ],
+    featured: false,
+    createdAt: sixMonthsAgoStr,
+    updatedAt: today
   },
   {
     id: "7",
@@ -128,7 +202,10 @@ const existingProductsInr: Product[] = [
       "https://images.unsplash.com/photo-1601652589223-38f82aa24fee?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "https://images.unsplash.com/photo-1603006905001-faa502d2e4fd?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "https://images.unsplash.com/photo-1582126977466-ac882a29eef5?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-    ]
+    ],
+    featured: false,
+    createdAt: sixMonthsAgoStr,
+    updatedAt: today
   },
   {
     id: "8",
@@ -146,7 +223,10 @@ const existingProductsInr: Product[] = [
       "https://images.unsplash.com/photo-1512428813834-c702c7702b78?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "https://images.unsplash.com/photo-1509423350716-97f9360b4e09?q=80&w=2575&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "https://images.unsplash.com/photo-1618810158890-4c7bc1741ec1?q=80&w=2627&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-    ]
+    ],
+    featured: false,
+    createdAt: sixMonthsAgoStr,
+    updatedAt: today
   },
   {
     id: "9",
@@ -164,7 +244,10 @@ const existingProductsInr: Product[] = [
       "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "https://images.unsplash.com/photo-1589003511303-d10653ff1e1e?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "https://images.unsplash.com/photo-1585595283238-ea010d2020cf?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-    ]
+    ],
+    featured: false,
+    createdAt: sixMonthsAgoStr,
+    updatedAt: today
   },
   {
     id: "10",
@@ -182,7 +265,9 @@ const existingProductsInr: Product[] = [
       "https://images.unsplash.com/photo-1603988363607-e1e4a66962c6?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
     ],
-    featured: true
+    featured: true,
+    createdAt: sixMonthsAgoStr,
+    updatedAt: today
   },
   {
     id: "11",
@@ -200,7 +285,10 @@ const existingProductsInr: Product[] = [
       "https://images.unsplash.com/photo-1584735935682-2f2b69dff9d2?q=80&w=2574&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "https://images.unsplash.com/photo-1580086319619-3ed498161c77?q=80&w=2669&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-    ]
+    ],
+    featured: false,
+    createdAt: sixMonthsAgoStr,
+    updatedAt: today
   },
   {
     id: "12",
@@ -217,7 +305,10 @@ const existingProductsInr: Product[] = [
       "https://images.unsplash.com/photo-1586165368502-1bad197a6461?q=80&w=2358&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "https://images.unsplash.com/photo-1529699211952-734e80c4d42b?q=80&w=2671&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
       "https://images.unsplash.com/photo-1580541832626-2a7131ee809f?q=80&w=2651&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
-    ]
+    ],
+    featured: false,
+    createdAt: sixMonthsAgoStr,
+    updatedAt: today
   }
 ];
 
