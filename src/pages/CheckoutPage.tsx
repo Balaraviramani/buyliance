@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import MainLayout from "@/components/layout/MainLayout";
 import { useCart } from "@/context/CartContext";
@@ -10,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/components/ui/use-toast";
-import { CreditCard, PaypalLogo, AppleLogo } from "lucide-react";
+import { CreditCard } from "lucide-react";
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
