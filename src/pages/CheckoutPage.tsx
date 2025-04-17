@@ -7,13 +7,13 @@ import CheckoutForm from "@/components/checkout/CheckoutForm";
 import OrderSummary from "@/components/checkout/OrderSummary";
 import { useCheckout } from "@/hooks/useCheckout";
 import { Progress } from "@/components/ui/progress";
+import { FormProvider } from "react-hook-form";
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
   const { items, subtotal, itemCount } = useCart();
   const {
-    formData,
-    setFormData,
+    form,
     paymentMethod,
     setPaymentMethod,
     isProcessing,
@@ -21,10 +21,9 @@ const CheckoutPage = () => {
     shippingCost,
     tax,
     total,
-    handleChange,
     handleCardNumberChange,
     handleExpiryDateChange,
-    handleSubmit,
+    onSubmit
   } = useCheckout();
   
   if (itemCount === 0) {
@@ -45,30 +44,29 @@ const CheckoutPage = () => {
             </div>
           )}
           
-          <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Customer Information, Shipping Address, Payment Method */}
-            <CheckoutForm
-              formData={formData}
-              paymentMethod={paymentMethod}
-              setPaymentMethod={setPaymentMethod}
-              handleChange={handleChange}
-              handleCardNumberChange={handleCardNumberChange}
-              handleExpiryDateChange={handleExpiryDateChange}
-              setFormData={setFormData}
-              isLoading={isLoading}
-            />
-            
-            {/* Order Summary */}
-            <OrderSummary
-              items={items}
-              subtotal={subtotal}
-              shippingCost={shippingCost}
-              tax={tax}
-              total={total}
-              isProcessing={isProcessing}
-              isLoading={isLoading}
-            />
-          </form>
+          <FormProvider {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Customer Information, Shipping Address, Payment Method */}
+              <CheckoutForm
+                paymentMethod={paymentMethod}
+                setPaymentMethod={setPaymentMethod}
+                handleCardNumberChange={handleCardNumberChange}
+                handleExpiryDateChange={handleExpiryDateChange}
+                isLoading={isLoading}
+              />
+              
+              {/* Order Summary */}
+              <OrderSummary
+                items={items}
+                subtotal={subtotal}
+                shippingCost={shippingCost}
+                tax={tax}
+                total={total}
+                isProcessing={isProcessing}
+                isLoading={isLoading}
+              />
+            </form>
+          </FormProvider>
         </div>
       </div>
     </MainLayout>

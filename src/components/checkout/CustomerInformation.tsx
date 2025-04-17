@@ -1,72 +1,80 @@
 
 import React from "react";
-import { Label } from "@/components/ui/label";
+import { useFormContext } from "react-hook-form";
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
-interface CustomerInformationProps {
-  formData: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
-  };
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-}
+const CustomerInformation: React.FC = () => {
+  const { control } = useFormContext();
 
-const CustomerInformation: React.FC<CustomerInformationProps> = ({
-  formData,
-  handleChange,
-}) => {
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
       <h2 className="text-xl font-bold mb-4">Customer Information</h2>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-        <div>
-          <Label htmlFor="firstName">First Name *</Label>
-          <Input
-            id="firstName"
-            name="firstName"
-            value={formData.firstName}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
-          <Label htmlFor="lastName">Last Name *</Label>
-          <Input
-            id="lastName"
-            name="lastName"
-            value={formData.lastName}
-            onChange={handleChange}
-            required
-          />
-        </div>
+        <FormField
+          control={control}
+          name="firstName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>First Name *</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={control}
+          name="lastName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Last Name *</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </div>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-        <div>
-          <Label htmlFor="email">Email Address *</Label>
-          <Input
-            id="email"
-            name="email"
-            type="email"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
-          <Label htmlFor="phone">Phone Number *</Label>
-          <Input
-            id="phone"
-            name="phone"
-            type="tel"
-            value={formData.phone}
-            onChange={handleChange}
-            required
-          />
-        </div>
+        <FormField
+          control={control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Email Address *</FormLabel>
+              <FormControl>
+                <Input {...field} type="email" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={control}
+          name="phone"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Phone Number *</FormLabel>
+              <FormControl>
+                <Input {...field} type="tel" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </div>
     </div>
   );

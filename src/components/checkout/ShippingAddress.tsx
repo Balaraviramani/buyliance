@@ -1,103 +1,117 @@
 
 import React from "react";
-import { Label } from "@/components/ui/label";
+import { useFormContext } from "react-hook-form";
+import {
+  FormField,
+  FormItem,
+  FormLabel,
+  FormControl,
+  FormMessage,
+} from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 
-interface ShippingAddressProps {
-  formData: {
-    address: string;
-    city: string;
-    state: string;
-    zipCode: string;
-    country: string;
-    saveInfo: boolean;
-  };
-  handleChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  setFormData: React.Dispatch<React.SetStateAction<any>>;
-}
+const ShippingAddress: React.FC = () => {
+  const { control } = useFormContext();
 
-const ShippingAddress: React.FC<ShippingAddressProps> = ({
-  formData,
-  handleChange,
-  setFormData,
-}) => {
   return (
     <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
       <h2 className="text-xl font-bold mb-4">Shipping Address</h2>
       
-      <div className="mb-4">
-        <Label htmlFor="address">Street Address *</Label>
-        <Input
-          id="address"
-          name="address"
-          value={formData.address}
-          onChange={handleChange}
-          required
+      <FormField
+        control={control}
+        name="address"
+        render={({ field }) => (
+          <FormItem className="mb-4">
+            <FormLabel>Street Address *</FormLabel>
+            <FormControl>
+              <Input {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+        <FormField
+          control={control}
+          name="city"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>City *</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={control}
+          name="state"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>State/Province *</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
         />
       </div>
       
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-        <div>
-          <Label htmlFor="city">City *</Label>
-          <Input
-            id="city"
-            name="city"
-            value={formData.city}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
-          <Label htmlFor="state">State/Province *</Label>
-          <Input
-            id="state"
-            name="state"
-            value={formData.state}
-            onChange={handleChange}
-            required
-          />
-        </div>
-      </div>
-      
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-        <div>
-          <Label htmlFor="zipCode">PIN Code *</Label>
-          <Input
-            id="zipCode"
-            name="zipCode"
-            value={formData.zipCode}
-            onChange={handleChange}
-            required
-          />
-        </div>
-        <div>
-          <Label htmlFor="country">Country</Label>
-          <Input
-            id="country"
-            name="country"
-            value={formData.country}
-            onChange={handleChange}
-            disabled
-          />
-        </div>
+        <FormField
+          control={control}
+          name="zipCode"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>PIN Code *</FormLabel>
+              <FormControl>
+                <Input {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={control}
+          name="country"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Country</FormLabel>
+              <FormControl>
+                <Input {...field} disabled />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
       </div>
       
       <div className="flex items-center mt-4">
-        <Checkbox
-          id="saveInfo"
+        <FormField
+          control={control}
           name="saveInfo"
-          checked={formData.saveInfo}
-          onCheckedChange={(checked) =>
-            setFormData({ ...formData, saveInfo: checked as boolean })
-          }
+          render={({ field }) => (
+            <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+              <div className="space-y-1 leading-none">
+                <FormLabel>
+                  Save this information for next time
+                </FormLabel>
+              </div>
+            </FormItem>
+          )}
         />
-        <label
-          htmlFor="saveInfo"
-          className="text-sm text-gray-600 ml-2"
-        >
-          Save this information for next time
-        </label>
       </div>
     </div>
   );

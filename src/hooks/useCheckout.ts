@@ -1,7 +1,32 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/context/CartContext";
 import { useNavigate } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+const checkoutFormSchema = z.object({
+  firstName: z.string().min(1, { message: "First name is required" }),
+  lastName: z.string().min(1, { message: "Last name is required" }),
+  email: z.string().email({ message: "Please enter a valid email address" }),
+  phone: z.string().min(10, { message: "Please enter a valid phone number" }),
+  address: z.string().min(1, { message: "Address is required" }),
+  city: z.string().min(1, { message: "City is required" }),
+  state: z.string().min(1, { message: "State is required" }),
+  zipCode: z.string().min(6, { message: "Please enter a valid PIN code" }),
+  country: z.string(),
+  saveInfo: z.boolean().optional(),
+  cardNumber: z.string().optional(),
+  expiryDate: z.string().optional(),
+  cvc: z.string().optional(),
+  agreeTerms: z.boolean().refine(val => val === true, {
+    message: "You must agree to the terms and conditions"
+  })
+});
+
+type CheckoutFormValues = z.infer<typeof checkoutFormSchema>;
 
 export const useCheckout = () => {
   const navigate = useNavigate();
@@ -10,23 +35,28 @@ export const useCheckout = () => {
   const [paymentMethod, setPaymentMethod] = useState("creditCard");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-    address: "",
-    city: "",
-    state: "",
-    zipCode: "",
-    country: "India",
-    saveInfo: false,
-    cardNumber: "",
-    expiryDate: "",
-    cvc: "",
-    agreeTerms: false
+  
+  const form = useForm<CheckoutFormValues>({
+    resolver: zodResolver(checkoutFormSchema),
+    defaultValues: {
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+      address: "",
+      city: "",
+      state: "",
+      zipCode: "",
+      country: "India",
+      saveInfo: false,
+      cardNumber: "",
+      expiryDate: "",
+      cvc: "",
+      agreeTerms: false
+    },
+    mode: "onChange"
   });
-
+  
   // Shipping cost (free if subtotal > ₹4,000)
   const shippingCost = subtotal > 4000 ? 0 : 199;
   
@@ -45,14 +75,6 @@ export const useCheckout = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setFormData({
-      ...formData,
-      [name]: type === "checkbox" ? checked : value,
-    });
-  };
-
   const formatCardNumber = (value: string) => {
     const v = value.replace(/\s+/g, "").replace(/[^0-9]/gi, "");
     const matches = v.match(/\d{4,16}/g);
@@ -68,10 +90,7 @@ export const useCheckout = () => {
 
   const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const formattedValue = formatCardNumber(e.target.value);
-    setFormData({
-      ...formData,
-      cardNumber: formattedValue,
-    });
+    form.setValue("cardNumber", formattedValue);
   };
 
   const handleExpiryDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,59 +101,36 @@ export const useCheckout = () => {
       value = `${value.slice(0, 2)}/${value.slice(2, 4)}`;
     }
     
-    setFormData({
-      ...formData,
-      expiryDate: value,
-    });
+    form.setValue("expiryDate", value);
   };
 
-  const validateForm = () => {
-    if (!formData.firstName || !formData.lastName || !formData.email || !formData.phone || 
-        !formData.address || !formData.city || !formData.state || !formData.zipCode) {
-      toast({
-        title: "Error",
-        description: "Please fill in all required fields",
-        variant: "destructive"
-      });
-      return false;
-    }
-
-    if (!formData.agreeTerms) {
-      toast({
-        title: "Error",
-        description: "Please agree to the terms and conditions",
-        variant: "destructive"
-      });
-      return false;
-    }
-
+  const onSubmit = (data: CheckoutFormValues) => {
+    // Extra validation for credit card if needed
     if (paymentMethod === "creditCard") {
-      if (!formData.cardNumber || !formData.expiryDate || !formData.cvc) {
-        toast({
-          title: "Error",
-          description: "Please fill in all payment details",
-          variant: "destructive"
+      if (!data.cardNumber || data.cardNumber.replace(/\s/g, "").length !== 16) {
+        form.setError("cardNumber", { 
+          type: "manual", 
+          message: "Please enter a valid 16-digit card number" 
         });
-        return false;
+        return;
       }
-
-      if (formData.cardNumber.replace(/\s/g, "").length !== 16) {
-        toast({
-          title: "Error",
-          description: "Please enter a valid 16-digit card number",
-          variant: "destructive"
+      
+      if (!data.expiryDate || data.expiryDate.length !== 5) {
+        form.setError("expiryDate", { 
+          type: "manual", 
+          message: "Please enter a valid expiry date (MM/YY)" 
         });
-        return false;
+        return;
+      }
+      
+      if (!data.cvc || data.cvc.length < 3) {
+        form.setError("cvc", { 
+          type: "manual", 
+          message: "Please enter a valid CVC" 
+        });
+        return;
       }
     }
-
-    return true;
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (!validateForm()) return;
     
     setIsProcessing(true);
 
@@ -149,7 +145,7 @@ export const useCheckout = () => {
         items: items,
         total: total,
         date: new Date().toISOString(),
-        shippingAddress: `${formData.address}, ${formData.city}, ${formData.state} - ${formData.zipCode}, ${formData.country}`,
+        shippingAddress: `${data.address}, ${data.city}, ${data.state} - ${data.zipCode}, ${data.country}`,
         status: "pending"
       }));
       
@@ -158,8 +154,7 @@ export const useCheckout = () => {
   };
 
   return {
-    formData,
-    setFormData,
+    form,
     paymentMethod,
     setPaymentMethod,
     isProcessing,
@@ -167,9 +162,8 @@ export const useCheckout = () => {
     shippingCost,
     tax,
     total,
-    handleChange,
     handleCardNumberChange,
     handleExpiryDateChange,
-    handleSubmit,
+    onSubmit
   };
 };
