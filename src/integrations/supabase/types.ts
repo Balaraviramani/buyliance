@@ -232,6 +232,7 @@ export type Database = {
           is_admin: boolean | null
           last_name: string | null
           updated_at: string | null
+          wishlist: string[] | null
         }
         Insert: {
           created_at?: string | null
@@ -240,6 +241,7 @@ export type Database = {
           is_admin?: boolean | null
           last_name?: string | null
           updated_at?: string | null
+          wishlist?: string[] | null
         }
         Update: {
           created_at?: string | null
@@ -248,6 +250,7 @@ export type Database = {
           is_admin?: boolean | null
           last_name?: string | null
           updated_at?: string | null
+          wishlist?: string[] | null
         }
         Relationships: []
       }

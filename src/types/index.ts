@@ -1,4 +1,3 @@
-
 export interface Product {
   id: string;
   name: string;
@@ -15,7 +14,7 @@ export interface Product {
   featured: boolean;
   createdAt: string;
   updatedAt: string;
-  brand?: string; // Added for filtering by brand
+  brand?: string;
 }
 
 export interface CartItem {
@@ -30,7 +29,7 @@ export interface User {
   lastName: string;
   address?: Address;
   orders?: Order[];
-  wishlist?: string[]; // Array of product IDs
+  wishlist?: string[];
   isAdmin: boolean;
   createdAt?: string;
   updatedAt?: string;
@@ -90,6 +89,14 @@ export interface Review {
 export interface Wishlist {
   userId: string;
   productIds: string[];
+}
+
+export interface WishlistItem {
+  id: string;
+  name: string;
+  price: number;
+  discountedPrice?: number;
+  images: string[];
 }
 
 export interface FilterOptions {

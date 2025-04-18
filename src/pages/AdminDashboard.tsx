@@ -6,7 +6,6 @@ import MainLayout from "@/components/layout/MainLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { products } from "@/data/products";
 import { Product, User, Order } from "@/types";
 import { Edit, Trash2, Plus, Search, AlertTriangle } from "lucide-react";
 import AddProductForm from "@/components/admin/AddProductForm";
@@ -72,7 +71,18 @@ const AdminDashboard = () => {
 
           if (error) throw error;
           
-          setUsers(data as User[] || []);
+          // Transform the fetched data to match the User type
+          const transformedUsers: User[] = (data || []).map(profile => ({
+            id: profile.id,
+            email: '', // We'll need to fetch this from auth.users if needed
+            firstName: profile.first_name || '',
+            lastName: profile.last_name || '',
+            isAdmin: profile.is_admin || false,
+            createdAt: profile.created_at,
+            updatedAt: profile.updated_at
+          }));
+
+          setUsers(transformedUsers);
         } catch (error) {
           console.error("Error fetching users:", error);
         }
@@ -105,21 +115,30 @@ const AdminDashboard = () => {
 
           if (error) throw error;
           
-          const formattedOrders = (data || []).map(order => ({
-            ...order,
+          // Transform the fetched data to match the Order type
+          const transformedOrders: Order[] = (data || []).map(order => ({
             id: order.id,
             userId: order.user_id,
+            items: [], // We'll need to fetch order items separately
+            shippingAddress: {
+              street: '',
+              city: '',
+              state: '',
+              postalCode: '',
+              country: ''
+            },
+            paymentMethod: order.payment_method,
             subtotal: order.subtotal,
             tax: order.tax,
             shipping: order.shipping,
             total: order.total,
-            status: order.status,
+            status: order.status as 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled',
             createdAt: order.created_at,
             updatedAt: order.updated_at,
-            paymentMethod: order.payment_method
+            paymentStatus: 'pending' // Default value, you might want to fetch this from the database
           }));
           
-          setOrders(formattedOrders as Order[]);
+          setOrders(transformedOrders);
         } catch (error) {
           console.error("Error fetching orders:", error);
         }

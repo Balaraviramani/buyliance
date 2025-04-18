@@ -1,4 +1,4 @@
-
+import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import MainLayout from "@/components/layout/MainLayout";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,13 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useNavigate } from "react-router-dom";
 import { UserCircle, Package, Heart, LogOut, Edit, Save } from "lucide-react";
-import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User } from "@/types";
+import { User, WishlistItem } from "@/types";
 
-// Define a type for user profile data
 interface UserProfile {
   id: string;
   firstName: string;
@@ -46,12 +44,10 @@ const AccountPage = () => {
     lastName: "",
   });
 
-  // Fetch user profile data
   useEffect(() => {
     const fetchUserData = async () => {
       if (user) {
         try {
-          // Get user profile from database
           const { data: profileData, error } = await supabase
             .from('profiles')
             .select('*')
@@ -83,7 +79,6 @@ const AccountPage = () => {
     fetchUserData();
   }, [user]);
 
-  // Fetch user orders
   useEffect(() => {
     const fetchOrders = async () => {
       if (user) {
@@ -109,18 +104,15 @@ const AccountPage = () => {
 
           if (error) throw error;
 
-          // Fetch products for each order item
           const ordersWithProducts = await Promise.all(
             (data || []).map(async (order) => {
               const productIds = order.order_items.map((item: any) => item.product_id);
               
-              // Fetch products for the order items
               const { data: products } = await supabase
                 .from('products')
                 .select('*')
                 .in('id', productIds);
               
-              // Map products to order items
               const itemsWithProducts = order.order_items.map((item: any) => {
                 const product = products?.find((p) => p.id === item.product_id);
                 return {
@@ -148,14 +140,13 @@ const AccountPage = () => {
     fetchOrders();
   }, [user]);
 
-  // Fetch wishlist items
   useEffect(() => {
     const fetchWishlist = async () => {
       if (user) {
         try {
           const { data: profileData, error: profileError } = await supabase
             .from('profiles')
-            .select('*')
+            .select('wishlist')
             .eq('id', user.id)
             .single();
 
@@ -170,12 +161,20 @@ const AccountPage = () => {
 
           const { data: products, error: productsError } = await supabase
             .from('products')
-            .select('id, name, price, discountedPrice, images')
+            .select('id, name, price, discounted_price, images')
             .in('id', wishlistIds);
 
           if (productsError) throw productsError;
 
-          setWishlistItems(products || []);
+          const wishlistItems: WishlistItem[] = (products || []).map(product => ({
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            discountedPrice: product.discounted_price || undefined,
+            images: product.images
+          }));
+
+          setWishlistItems(wishlistItems);
         } catch (error) {
           console.error("Error fetching wishlist:", error);
           toast.error("Failed to load wishlist");
@@ -214,7 +213,6 @@ const AccountPage = () => {
   const handleSaveProfile = async () => {
     setIsLoading(true);
     try {
-      // Update profile in database
       const { error } = await supabase
         .from('profiles')
         .update({
@@ -226,7 +224,6 @@ const AccountPage = () => {
 
       if (error) throw error;
       
-      // Update profile in state
       setProfile({
         ...profile,
         firstName: formData.firstName,
@@ -245,27 +242,23 @@ const AccountPage = () => {
 
   const handleRemoveFromWishlist = async (productId: string) => {
     try {
-      // Get current wishlist
       const { data: currentProfile, error: fetchError } = await supabase
         .from('profiles')
         .select('wishlist')
-        .eq('id', user.id)
+        .eq('id', user?.id)
         .single();
 
       if (fetchError) throw fetchError;
 
-      // Remove product from wishlist
       const updatedWishlist = (currentProfile?.wishlist || []).filter(id => id !== productId);
       
-      // Update profile with new wishlist
       const { error: updateError } = await supabase
         .from('profiles')
         .update({ wishlist: updatedWishlist })
-        .eq('id', user.id);
+        .eq('id', user?.id);
 
       if (updateError) throw updateError;
 
-      // Update local state
       setWishlistItems(wishlistItems.filter(item => item.id !== productId));
       
       toast.success("Item removed from wishlist");
