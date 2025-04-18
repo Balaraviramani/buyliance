@@ -84,7 +84,7 @@ const AuthPage = () => {
     setIsLoading(true);
     try {
       // Sign up the user
-      const { error: signUpError } = await supabase.auth.signUp({
+      const { error: signUpError, data: signUpData } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
         options: {
@@ -97,22 +97,39 @@ const AuthPage = () => {
       
       if (signUpError) throw signUpError;
       
-      toast({
-        title: "Success!",
-        description: "Your account has been created. Please check your email to verify your account.",
-      });
-      
-      // Automatically log in the user after sign up
-      const { error: signInError } = await supabase.auth.signInWithPassword({
-        email: data.email,
-        password: data.password,
-      });
-      
-      if (signInError) {
-        console.error("Auto login failed:", signInError);
-        setIsLogin(true); // Switch back to login form if auto-login fails
-      } else {
-        navigate("/");
+      // Check if user was created successfully
+      if (signUpData?.user) {
+        // Also create a profile record explicitly 
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert({ 
+            id: signUpData.user.id,
+            first_name: data.firstName,
+            last_name: data.lastName,
+            is_admin: false
+          });
+          
+        if (profileError) {
+          console.error("Error creating profile:", profileError);
+        }
+        
+        toast({
+          title: "Success!",
+          description: "Your account has been created. You can now log in.",
+        });
+        
+        // Auto login after signup
+        const { error: signInError } = await supabase.auth.signInWithPassword({
+          email: data.email,
+          password: data.password,
+        });
+        
+        if (!signInError) {
+          navigate("/");
+        } else {
+          console.error("Auto login failed:", signInError);
+          setIsLogin(true); // Switch back to login form if auto-login fails
+        }
       }
     } catch (error: any) {
       toast({
