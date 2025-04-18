@@ -1,5 +1,6 @@
 
 import React from "react";
+import { Link } from "react-router-dom";
 import MainLayout from "@/components/layout/MainLayout";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
@@ -65,9 +66,9 @@ const FAQsPage = () => {
               Our customer service team is here to help you with any questions or concerns.
             </p>
             <div className="flex justify-center">
-              <a href="/contact">
+              <Link to="/contact">
                 <Button>Contact Us</Button>
-              </a>
+              </Link>
             </div>
           </div>
         </div>
