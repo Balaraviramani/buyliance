@@ -91,7 +91,7 @@ const CustomFooter = () => {
             <h3 className="text-xl font-bold mb-4">Customer Service</h3>
             <ul className="space-y-2">
               <li>
-                <Link to="/account/orders" className="text-gray-300 hover:text-white transition-colors">Track Order</Link>
+                <Link to="/track-order" className="text-gray-300 hover:text-white transition-colors">Track Order</Link>
               </li>
               <li>
                 <Link to="/faqs" className="text-gray-300 hover:text-white transition-colors">FAQs</Link>

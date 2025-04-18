@@ -7,10 +7,12 @@ import { Button } from "@/components/ui/button";
 import { products } from "@/data/products";
 import { Product } from "@/types";
 import { Edit, Trash2, Plus, Search } from "lucide-react";
+import AddProductForm from "@/components/admin/AddProductForm";
 
 const AdminDashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [filteredProducts, setFilteredProducts] = useState<Product[]>(products);
+  const [isAddProductOpen, setIsAddProductOpen] = useState(false);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value;
@@ -30,7 +32,7 @@ const AdminDashboard = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
           <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-          <Button>
+          <Button onClick={() => setIsAddProductOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Add New Product
           </Button>
@@ -150,6 +152,8 @@ const AdminDashboard = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      <AddProductForm isOpen={isAddProductOpen} onClose={() => setIsAddProductOpen(false)} />
     </MainLayout>
   );
 };
