@@ -9,15 +9,9 @@ import { UserCircle, Package, Heart, LogOut, Edit, Save } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, WishlistItem } from "@/types";
+import { User } from "@/types";
 
-interface UserProfile {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-}
-
+// Remove the duplicate WishlistItem type import
 interface WishlistItem {
   id: string;
   name: string;
@@ -140,6 +134,7 @@ const AccountPage = () => {
     fetchOrders();
   }, [user]);
 
+  // Fetch wishlist items
   useEffect(() => {
     const fetchWishlist = async () => {
       if (user) {
@@ -166,6 +161,7 @@ const AccountPage = () => {
 
           if (productsError) throw productsError;
 
+          // Transform products to match WishlistItem type
           const wishlistItems: WishlistItem[] = (products || []).map(product => ({
             id: product.id,
             name: product.name,

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
@@ -11,10 +10,11 @@ import { Edit, Trash2, Plus, Search, AlertTriangle } from "lucide-react";
 import AddProductForm from "@/components/admin/AddProductForm";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { products as productsData } from "@/data/products";
 
 const AdminDashboard = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>(products);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>(productsData);
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -24,7 +24,6 @@ const AdminDashboard = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // Check if user is an admin
   useEffect(() => {
     const checkAdminStatus = async () => {
       if (!user) {
@@ -44,7 +43,6 @@ const AdminDashboard = () => {
         if (profile && profile.is_admin) {
           setIsAdmin(true);
         } else {
-          // Not an admin, redirect to home page
           toast.error("You do not have access to the admin dashboard");
           navigate("/");
         }
@@ -60,7 +58,6 @@ const AdminDashboard = () => {
     checkAdminStatus();
   }, [user, navigate]);
 
-  // Fetch users
   useEffect(() => {
     const fetchUsers = async () => {
       if (isAdmin) {
@@ -71,10 +68,9 @@ const AdminDashboard = () => {
 
           if (error) throw error;
           
-          // Transform the fetched data to match the User type
           const transformedUsers: User[] = (data || []).map(profile => ({
             id: profile.id,
-            email: '', // We'll need to fetch this from auth.users if needed
+            email: '',
             firstName: profile.first_name || '',
             lastName: profile.last_name || '',
             isAdmin: profile.is_admin || false,
@@ -92,7 +88,6 @@ const AdminDashboard = () => {
     fetchUsers();
   }, [isAdmin]);
 
-  // Fetch orders
   useEffect(() => {
     const fetchOrders = async () => {
       if (isAdmin) {
@@ -115,11 +110,10 @@ const AdminDashboard = () => {
 
           if (error) throw error;
           
-          // Transform the fetched data to match the Order type
           const transformedOrders: Order[] = (data || []).map(order => ({
             id: order.id,
             userId: order.user_id,
-            items: [], // We'll need to fetch order items separately
+            items: [],
             shippingAddress: {
               street: '',
               city: '',
@@ -135,7 +129,7 @@ const AdminDashboard = () => {
             status: order.status as 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled',
             createdAt: order.created_at,
             updatedAt: order.updated_at,
-            paymentStatus: 'pending' // Default value, you might want to fetch this from the database
+            paymentStatus: 'pending'
           }));
           
           setOrders(transformedOrders);
@@ -148,12 +142,11 @@ const AdminDashboard = () => {
     fetchOrders();
   }, [isAdmin]);
 
-  // Handle search for products
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const term = e.target.value;
     setSearchTerm(term);
     
-    const filtered = products.filter((product) => 
+    const filtered = productsData.filter((product) => 
       product.name.toLowerCase().includes(term.toLowerCase()) ||
       product.category.toLowerCase().includes(term.toLowerCase()) ||
       product.id.toLowerCase().includes(term.toLowerCase())
@@ -162,7 +155,6 @@ const AdminDashboard = () => {
     setFilteredProducts(filtered);
   };
 
-  // Handle updating order status
   const handleUpdateOrderStatus = async (orderId: string, newStatus: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled') => {
     try {
       const { error } = await supabase
@@ -175,7 +167,6 @@ const AdminDashboard = () => {
 
       if (error) throw error;
       
-      // Update local state
       setOrders(prev => 
         prev.map(order => 
           order.id === orderId ? { ...order, status: newStatus } : order
@@ -189,7 +180,6 @@ const AdminDashboard = () => {
     }
   };
 
-  // Handle updating user admin status
   const handleToggleAdminStatus = async (userId: string, currentStatus: boolean) => {
     try {
       const { error } = await supabase
@@ -202,7 +192,6 @@ const AdminDashboard = () => {
 
       if (error) throw error;
       
-      // Update local state
       setUsers(prev => 
         prev.map(user => 
           user.id === userId ? { ...user, isAdmin: !currentStatus } : user
