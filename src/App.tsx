@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -29,6 +28,8 @@ import ContactPage from "./pages/ContactPage";
 import AccountPage from "./pages/AccountPage";
 import AboutPage from "./pages/AboutPage";
 import CategoriesPage from "./pages/CategoriesPage";
+import MyOrdersPage from "./pages/MyOrdersPage";
+import MyWishlistPage from "./pages/MyWishlistPage";
 
 const queryClient = new QueryClient();
 
@@ -62,6 +63,8 @@ const App = () => (
                 <Route path="/about" element={<AboutPage />} />
                 <Route path="/categories" element={<CategoriesPage />} />
                 <Route path="/categories/:slug" element={<CategoriesPage />} />
+                <Route path="/account/orders" element={<MyOrdersPage />} />
+                <Route path="/account/wishlist" element={<MyWishlistPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </BrowserRouter>
