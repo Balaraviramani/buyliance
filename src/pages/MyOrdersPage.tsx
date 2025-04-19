@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Package } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
-import type { Order } from "@/types";
+import type { Order, OrderItem, Address } from "@/types";
 import { Separator } from "@/components/ui/separator";
 
 const MyOrdersPage = () => {
@@ -39,7 +39,49 @@ const MyOrdersPage = () => {
         .order("created_at", { ascending: false });
 
       if (error) throw error;
-      setOrders(data || []);
+
+      // Map the database response to match our Order type
+      const formattedOrders: Order[] = (data || []).map(order => ({
+        id: order.id,
+        userId: order.user_id,
+        items: order.order_items.map(item => ({
+          product: {
+            id: item.product.id || "",
+            name: item.product.name,
+            images: item.product.images,
+            description: "",
+            price: 0,
+            currency: "USD",
+            category: "",
+            tags: [],
+            rating: 0,
+            reviews: 0,
+            stock: 0,
+            featured: false,
+            createdAt: "",
+            updatedAt: ""
+          },
+          quantity: item.quantity,
+          price: item.price
+        })),
+        shippingAddress: {
+          street: order.shipping_address?.street || "",
+          city: order.shipping_address?.city || "",
+          state: order.shipping_address?.state || "",
+          postalCode: order.shipping_address?.postal_code || "",
+          country: "USA"
+        },
+        paymentMethod: order.payment_method,
+        subtotal: order.subtotal,
+        tax: order.tax,
+        shipping: order.shipping,
+        total: order.total,
+        status: order.status as 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled',
+        createdAt: order.created_at,
+        updatedAt: order.updated_at || order.created_at
+      }));
+
+      setOrders(formattedOrders);
     } catch (error) {
       console.error("Error fetching orders:", error);
       toast.error("Failed to load orders");
@@ -93,8 +135,8 @@ const MyOrdersPage = () => {
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {order.items.map((item) => (
-                        <TableRow key={item.id}>
+                      {order.items.map((item, index) => (
+                        <TableRow key={`${order.id}-item-${index}`}>
                           <TableCell>{item.product.name}</TableCell>
                           <TableCell>{item.quantity}</TableCell>
                           <TableCell>${item.price.toFixed(2)}</TableCell>

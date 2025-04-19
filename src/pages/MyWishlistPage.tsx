@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Heart, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import type { WishlistItem } from "@/types";
+import type { WishlistItem, Product } from "@/types";
 import { useCart } from "@/context/CartContext";
 import { Separator } from "@/components/ui/separator";
 
@@ -82,14 +82,27 @@ const MyWishlistPage = () => {
   };
 
   const moveToCart = async (item: WishlistItem) => {
-    addItem({
+    // Convert WishlistItem to Product before adding to cart
+    const product: Product = {
       id: item.id,
       name: item.name,
       price: item.price,
       discountedPrice: item.discountedPrice,
       images: item.images,
-      quantity: 1
-    });
+      description: "",
+      currency: "USD",
+      category: "",
+      tags: [],
+      rating: 0,
+      reviews: 0,
+      stock: 0,
+      featured: false,
+      createdAt: "",
+      updatedAt: ""
+    };
+    
+    // Now add the product to cart
+    addItem(product);
     await removeFromWishlist(item.id);
     toast.success("Added to cart");
   };
