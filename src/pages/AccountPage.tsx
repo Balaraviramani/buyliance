@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import MainLayout from "@/components/layout/MainLayout";
@@ -9,15 +10,14 @@ import { UserCircle, Package, Heart, LogOut, Edit, Save } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User } from "@/types";
+import { User, WishlistItem } from "@/types";
 
-// Remove the duplicate WishlistItem type import
-interface WishlistItem {
+// Define the UserProfile interface for the local component state
+interface UserProfile {
   id: string;
-  name: string;
-  price: number;
-  discountedPrice?: number;
-  images: string[];
+  firstName: string;
+  lastName: string;
+  email: string;
 }
 
 const AccountPage = () => {
