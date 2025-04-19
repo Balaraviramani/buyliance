@@ -46,7 +46,9 @@ const MyOrdersPage = () => {
         userId: order.user_id,
         items: order.order_items.map(item => ({
           product: {
-            id: item.product.id || "",
+            // Since we're only fetching name and images from the database,
+            // we need to provide default values for other required fields
+            id: "", // We don't have this in the query response
             name: item.product.name,
             images: item.product.images,
             description: "",
