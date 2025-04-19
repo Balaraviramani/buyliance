@@ -21,7 +21,7 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const isMobile = useIsMobile();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const { items } = useCart();
   const { toast } = useToast();
   
@@ -45,6 +45,24 @@ const Navbar = () => {
         title: "Error",
         description: "Please enter a search term",
         variant: "destructive",
+      });
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "Logged out",
+        description: "You have been logged out successfully"
+      });
+      navigate("/");
+    } catch (error) {
+      console.error("Error logging out:", error);
+      toast({
+        title: "Error",
+        description: "Failed to log out",
+        variant: "destructive"
       });
     }
   };
@@ -129,13 +147,7 @@ const Navbar = () => {
                   <DropdownMenuItem onClick={() => navigate("/account/wishlist")}>
                     My Wishlist
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => {
-                    toast({
-                      title: "Logged out",
-                      description: "You have been logged out successfully"
-                    });
-                    navigate("/");
-                  }}>
+                  <DropdownMenuItem onClick={handleLogout}>
                     Logout
                   </DropdownMenuItem>
                 </>
