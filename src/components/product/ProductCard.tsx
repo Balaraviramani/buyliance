@@ -1,12 +1,13 @@
-
 import { Link } from "react-router-dom";
 import { Heart, ShoppingCart, Star } from "lucide-react";
 import { Product } from "@/types";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
+import { useAuth } from "@/context/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ProductCardProps {
   product: Product;
@@ -17,7 +18,77 @@ const ProductCard = ({ product, variant = "default" }: ProductCardProps) => {
   const { addItem } = useCart();
   const { toast } = useToast();
   const [isHovered, setIsHovered] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
+  const [isInWishlist, setIsInWishlist] = useState(false);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    checkWishlistStatus();
+  }, [user, product.id]);
+
+  const checkWishlistStatus = async () => {
+    if (!user) return;
+
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('wishlist')
+        .eq('id', user.id)
+        .single();
+
+      setIsInWishlist(profile?.wishlist?.includes(product.id) || false);
+    } catch (error) {
+      console.error('Error checking wishlist status:', error);
+    }
+  };
+
+  const handleToggleWishlist = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!user) {
+      toast({
+        title: "Please login",
+        description: "You need to be logged in to add items to your wishlist",
+      });
+      return;
+    }
+
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('wishlist')
+        .eq('id', user.id)
+        .single();
+
+      let newWishlist = profile?.wishlist || [];
+
+      if (isInWishlist) {
+        newWishlist = newWishlist.filter((id: string) => id !== product.id);
+      } else {
+        newWishlist.push(product.id);
+      }
+
+      await supabase
+        .from('profiles')
+        .update({ wishlist: newWishlist })
+        .eq('id', user.id);
+
+      setIsInWishlist(!isInWishlist);
+      toast({
+        title: isInWishlist ? "Removed from wishlist" : "Added to wishlist",
+        description: isInWishlist 
+          ? `${product.name} has been removed from your wishlist`
+          : `${product.name} has been added to your wishlist`,
+      });
+    } catch (error) {
+      console.error('Error updating wishlist:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update wishlist",
+        variant: "destructive",
+      });
+    }
+  };
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -32,13 +103,6 @@ const ProductCard = ({ product, variant = "default" }: ProductCardProps) => {
   const handleToggleFavorite = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setIsFavorite(!isFavorite);
-    toast({
-      title: isFavorite ? "Removed from favorites" : "Added to favorites",
-      description: isFavorite 
-        ? `${product.name} has been removed from your favorites.`
-        : `${product.name} has been added to your favorites.`,
-    });
   };
 
   // Calculate discount percentage
@@ -74,10 +138,10 @@ const ProductCard = ({ product, variant = "default" }: ProductCardProps) => {
 
         {/* Favorite button */}
         <button
-          onClick={handleToggleFavorite}
+          onClick={handleToggleWishlist}
           className="absolute right-2 top-2 rounded-full bg-white p-1.5 text-gray-700 shadow-sm transition-colors hover:text-red-500"
         >
-          <Heart className={cn("h-4 w-4", isFavorite && "fill-red-500 text-red-500")} />
+          <Heart className={cn("h-4 w-4", isInWishlist && "fill-red-500 text-red-500")} />
         </button>
 
         {/* Quick action overlay */}

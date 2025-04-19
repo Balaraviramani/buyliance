@@ -1,15 +1,15 @@
-
 import React from "react";
 import { useEffect, useState } from "react";
 import MainLayout from "@/components/layout/MainLayout";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Package } from "lucide-react";
+import { Package, Clock, CheckCircle2, XCircle, Truck } from "lucide-react";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "sonner";
 import type { Order, OrderItem, Address } from "@/types";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 
 const MyOrdersPage = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -40,15 +40,12 @@ const MyOrdersPage = () => {
 
       if (error) throw error;
 
-      // Map the database response to match our Order type
       const formattedOrders: Order[] = (data || []).map(order => ({
         id: order.id,
         userId: order.user_id,
         items: order.order_items.map(item => ({
           product: {
-            // Since we're only fetching name and images from the database,
-            // we need to provide default values for other required fields
-            id: "", // We don't have this in the query response
+            id: "",
             name: item.product.name,
             images: item.product.images,
             description: "",
@@ -96,6 +93,40 @@ const MyOrdersPage = () => {
     return new Date(dateString).toLocaleDateString();
   };
 
+  const getStatusIcon = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return <Clock className="h-4 w-4 text-yellow-500" />;
+      case 'processing':
+        return <Package className="h-4 w-4 text-blue-500" />;
+      case 'shipped':
+        return <Truck className="h-4 w-4 text-purple-500" />;
+      case 'delivered':
+        return <CheckCircle2 className="h-4 w-4 text-green-500" />;
+      case 'cancelled':
+        return <XCircle className="h-4 w-4 text-red-500" />;
+      default:
+        return <Clock className="h-4 w-4" />;
+    }
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'pending':
+        return "bg-yellow-100 text-yellow-800";
+      case 'processing':
+        return "bg-blue-100 text-blue-800";
+      case 'shipped':
+        return "bg-purple-100 text-purple-800";
+      case 'delivered':
+        return "bg-green-100 text-green-800";
+      case 'cancelled':
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
   return (
     <MainLayout>
       <div className="container mx-auto py-8">
@@ -119,12 +150,21 @@ const MyOrdersPage = () => {
               <Card key={order.id}>
                 <CardHeader>
                   <div className="flex justify-between items-center">
-                    <CardTitle className="text-lg">
-                      Order #{order.id.slice(0, 8)}
-                    </CardTitle>
-                    <div className="text-sm text-muted-foreground">
-                      {formatDate(order.createdAt)}
+                    <div className="space-y-1">
+                      <CardTitle className="text-lg">
+                        Order #{order.id.slice(0, 8)}
+                      </CardTitle>
+                      <p className="text-sm text-muted-foreground">
+                        {formatDate(order.createdAt)}
+                      </p>
                     </div>
+                    <Badge 
+                      variant="secondary" 
+                      className={`flex items-center gap-1 px-2 py-1 ${getStatusColor(order.status)}`}
+                    >
+                      {getStatusIcon(order.status)}
+                      <span className="capitalize">{order.status}</span>
+                    </Badge>
                   </div>
                 </CardHeader>
                 <CardContent>
@@ -139,7 +179,14 @@ const MyOrdersPage = () => {
                     <TableBody>
                       {order.items.map((item, index) => (
                         <TableRow key={`${order.id}-item-${index}`}>
-                          <TableCell>{item.product.name}</TableCell>
+                          <TableCell className="flex items-center gap-2">
+                            <img 
+                              src={item.product.images[0] || "/placeholder.svg"} 
+                              alt={item.product.name}
+                              className="h-12 w-12 object-cover rounded"
+                            />
+                            <span>{item.product.name}</span>
+                          </TableCell>
                           <TableCell>{item.quantity}</TableCell>
                           <TableCell>${item.price.toFixed(2)}</TableCell>
                         </TableRow>
@@ -148,12 +195,20 @@ const MyOrdersPage = () => {
                   </Table>
                   <div className="mt-4 space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span>Status:</span>
-                      <span className="font-medium capitalize">{order.status}</span>
+                      <span>Subtotal:</span>
+                      <span>${order.subtotal.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between text-sm">
+                      <span>Shipping:</span>
+                      <span>${order.shipping.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span>Tax:</span>
+                      <span>${order.tax.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between font-medium">
                       <span>Total:</span>
-                      <span className="font-medium">${order.total.toFixed(2)}</span>
+                      <span>${order.total.toFixed(2)}</span>
                     </div>
                   </div>
                 </CardContent>
