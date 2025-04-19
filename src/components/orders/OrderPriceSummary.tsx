@@ -9,7 +9,8 @@ interface OrderPriceSummaryProps {
 export const OrderPriceSummary = ({ subtotal, shipping, tax, total }: OrderPriceSummaryProps) => {
   // Format currency values consistently
   const formatCurrency = (value: number) => {
-    return value.toFixed(2);
+    // Ensure the value is treated as a number and formatted to 2 decimal places
+    return Number(value).toFixed(2);
   };
   
   return (

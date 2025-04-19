@@ -9,6 +9,8 @@ import { toast } from "sonner";
 import type { Order } from "@/types";
 import { Separator } from "@/components/ui/separator";
 import { OrderCard } from "@/components/orders/OrderCard";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const MyOrdersPage = () => {
   const [orders, setOrders] = useState<Order[]>([]);
@@ -18,11 +20,14 @@ const MyOrdersPage = () => {
   useEffect(() => {
     if (user) {
       fetchOrders();
+    } else {
+      setLoading(false);
     }
   }, [user]);
 
   const fetchOrders = async () => {
     try {
+      // First try to get orders directly without joining profiles
       const { data, error } = await supabase
         .from("orders")
         .select(`
@@ -37,18 +42,24 @@ const MyOrdersPage = () => {
         .eq("user_id", user?.id)
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error("Error fetching orders:", error);
+        toast.error("Failed to load orders");
+        setOrders([]);
+        setLoading(false);
+        return;
+      }
 
       const formattedOrders: Order[] = (data || []).map(order => ({
         id: order.id,
         userId: order.user_id,
         items: order.order_items.map(item => ({
           product: {
-            id: "",
+            id: item.product.id || "",
             name: item.product.name,
             images: item.product.images,
             description: "",
-            price: 0,
+            price: item.price, // Use the order item price directly
             currency: "USD",
             category: "",
             tags: [],
@@ -101,8 +112,21 @@ const MyOrdersPage = () => {
         </div>
         <Separator className="mb-6" />
         
-        {loading ? (
-          <p>Loading orders...</p>
+        {!user ? (
+          <Card>
+            <CardContent className="py-8 text-center">
+              <p className="text-muted-foreground mb-4">You need to be logged in to view your orders</p>
+              <Link to="/auth">
+                <Button>Log In</Button>
+              </Link>
+            </CardContent>
+          </Card>
+        ) : loading ? (
+          <Card>
+            <CardContent className="py-8">
+              <p className="text-center">Loading orders...</p>
+            </CardContent>
+          </Card>
         ) : orders.length === 0 ? (
           <Card>
             <CardContent className="py-8">
