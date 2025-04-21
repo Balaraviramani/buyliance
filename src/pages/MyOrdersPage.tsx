@@ -36,7 +36,7 @@ const MyOrdersPage = () => {
           order_items(
             quantity,
             price,
-            product:products(name, images)
+            product:products(id, name, images)
           )
         `)
         .eq("user_id", user?.id)
