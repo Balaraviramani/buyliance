@@ -67,6 +67,7 @@ const Navbar = () => {
     }
   };
 
+  // Always direct users to /auth instead of using different paths
   const handleAccountClick = () => {
     if (user) {
       navigate("/account");

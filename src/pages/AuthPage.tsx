@@ -37,6 +37,7 @@ const AuthPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Create separate form instances for login and register
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -55,6 +56,19 @@ const AuthPage = () => {
       lastName: "",
     },
   });
+
+  // Reset forms when switching between login and register
+  const handleSwitchForm = (toLogin: boolean) => {
+    if (toLogin && !isLogin) {
+      setIsLogin(true);
+      // Reset register form
+      registerForm.reset();
+    } else if (!toLogin && isLogin) {
+      setIsLogin(false);
+      // Reset login form
+      loginForm.reset();
+    }
+  };
 
   const onLoginSubmit = async (data: LoginFormValues) => {
     setIsLoading(true);
@@ -106,30 +120,26 @@ const AuthPage = () => {
             id: signUpData.user.id,
             first_name: data.firstName,
             last_name: data.lastName,
-            is_admin: false
+            is_admin: false,
+            wishlist: []
           });
           
         if (profileError) {
           console.error("Error creating profile:", profileError);
-        }
-        
-        toast({
-          title: "Success!",
-          description: "Your account has been created. You can now log in.",
-        });
-        
-        // Auto login after signup
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email: data.email,
-          password: data.password,
-        });
-        
-        if (!signInError) {
-          navigate("/");
+          toast({
+            title: "Warning",
+            description: "Account created but profile setup had issues. Some features may be limited.",
+            variant: "destructive",
+          });
         } else {
-          console.error("Auto login failed:", signInError);
-          setIsLogin(true); // Switch back to login form if auto-login fails
+          toast({
+            title: "Success!",
+            description: "Your account has been created. You can now log in.",
+          });
         }
+        
+        // After successful registration, switch to login form
+        handleSwitchForm(true);
       }
     } catch (error: any) {
       toast({
@@ -157,7 +167,8 @@ const AuthPage = () => {
                   className={`px-4 py-2 w-1/2 text-center ${
                     isLogin ? "border-b-2 border-brand font-medium text-brand" : "text-gray-500"
                   }`}
-                  onClick={() => setIsLogin(true)}
+                  onClick={() => handleSwitchForm(true)}
+                  type="button"
                 >
                   Login
                 </button>
@@ -165,7 +176,8 @@ const AuthPage = () => {
                   className={`px-4 py-2 w-1/2 text-center ${
                     !isLogin ? "border-b-2 border-brand font-medium text-brand" : "text-gray-500"
                   }`}
-                  onClick={() => setIsLogin(false)}
+                  onClick={() => handleSwitchForm(false)}
+                  type="button"
                 >
                   Register
                 </button>
