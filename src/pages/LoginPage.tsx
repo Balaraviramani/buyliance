@@ -49,7 +49,7 @@ const LoginPage = () => {
     }
   };
 
-  // Handle registration
+  // Handle registration with completely separate state
   const [isRegistering, setIsRegistering] = useState(false);
   const [registerData, setRegisterData] = useState({
     email: "",
@@ -109,9 +109,14 @@ const LoginPage = () => {
         } else {
           toast.success("Account created successfully! You can now log in.");
           setIsRegistering(false);
-          setFormData({
-            ...formData,
-            email: registerData.email
+          // Don't update login form with register data
+          // Just reset the register form
+          setRegisterData({
+            email: "",
+            password: "",
+            confirmPassword: "",
+            firstName: "",
+            lastName: ""
           });
         }
       }
@@ -142,6 +147,7 @@ const LoginPage = () => {
                     !isRegistering ? "border-b-2 border-brand font-medium text-brand" : "text-gray-500"
                   }`}
                   onClick={() => setIsRegistering(false)}
+                  type="button"
                 >
                   Login
                 </button>
@@ -150,6 +156,7 @@ const LoginPage = () => {
                     isRegistering ? "border-b-2 border-brand font-medium text-brand" : "text-gray-500"
                   }`}
                   onClick={() => setIsRegistering(true)}
+                  type="button"
                 >
                   Register
                 </button>
