@@ -67,7 +67,7 @@ const Navbar = () => {
     }
   };
 
-  // Always direct users to /auth instead of using different paths
+  // Direct users to /auth for all authentication needs
   const handleAccountClick = () => {
     if (user) {
       navigate("/account");
@@ -157,7 +157,7 @@ const Navbar = () => {
                   <DropdownMenuItem onClick={() => navigate("/auth")}>
                     Login
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => navigate("/auth")}>
+                  <DropdownMenuItem onClick={() => navigate("/auth?register=true")}>
                     Register
                   </DropdownMenuItem>
                 </>

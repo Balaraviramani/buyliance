@@ -37,13 +37,14 @@ const AuthPage = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  // Create separate form instances for login and register
+  // Create completely separate form instances for login and register
   const loginForm = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
     },
+    mode: "onChange",
   });
 
   const registerForm = useForm<RegisterFormValues>({
@@ -55,17 +56,16 @@ const AuthPage = () => {
       firstName: "",
       lastName: "",
     },
+    mode: "onChange",
   });
 
-  // Reset forms when switching between login and register
+  // Safely switch between forms
   const handleSwitchForm = (toLogin: boolean) => {
     if (toLogin && !isLogin) {
       setIsLogin(true);
-      // Reset register form
       registerForm.reset();
     } else if (!toLogin && isLogin) {
       setIsLogin(false);
-      // Reset login form
       loginForm.reset();
     }
   };
@@ -77,13 +77,17 @@ const AuthPage = () => {
         email: data.email,
         password: data.password,
       });
+      
       if (error) throw error;
+      
       toast({
         title: "Success!",
         description: "You have successfully logged in.",
       });
+      
       navigate("/");
     } catch (error: any) {
+      console.error("Login failed:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to login. Please try again.",
@@ -113,7 +117,7 @@ const AuthPage = () => {
       
       // Check if user was created successfully
       if (signUpData?.user) {
-        // Also create a profile record explicitly 
+        // Create a profile record explicitly 
         const { error: profileError } = await supabase
           .from('profiles')
           .insert({ 
@@ -138,10 +142,11 @@ const AuthPage = () => {
           });
         }
         
-        // After successful registration, switch to login form
+        // Switch to login form after successful registration
         handleSwitchForm(true);
       }
     } catch (error: any) {
+      console.error("Registration failed:", error);
       toast({
         title: "Error",
         description: error.message || "Failed to create account. Please try again.",
