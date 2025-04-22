@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,14 +11,38 @@ import { UserMenu } from "./nav/UserMenu";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const isMobile = useIsMobile();
+
+  // Close mobile menu when switching to desktop view
+  useEffect(() => {
+    if (!isMobile && isMenuOpen) {
+      setIsMenuOpen(false);
+    }
+  }, [isMobile]);
+
+  // Handle scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 20) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
   return (
-    <nav className="sticky top-0 z-40 w-full bg-white border-b border-gray-200">
+    <nav className={`sticky top-0 z-40 w-full bg-white border-b border-gray-200 ${
+      isScrolled ? 'shadow-sm' : ''
+    }`}>
       <div className="container flex items-center justify-between h-16 mx-auto px-4">
         {/* Logo */}
         <Link to="/" className="flex items-center">
@@ -54,7 +78,7 @@ const Navbar = () => {
 
       {/* Mobile Navigation */}
       {isMobile && isMenuOpen && (
-        <div className="absolute w-full bg-white border-b border-gray-200 shadow-lg py-4">
+        <div className="absolute w-full bg-white border-b border-gray-200 shadow-lg py-4 animate-fade-in">
           <div className="container mx-auto px-4 flex flex-col space-y-4">
             <SearchBar className="w-full mb-2" />
             <NavMenu 

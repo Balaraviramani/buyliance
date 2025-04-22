@@ -12,11 +12,11 @@ const CartPage = () => {
   const { items, itemCount, subtotal, updateQuantity, removeItem } = useCart();
   const [couponCode, setCouponCode] = useState("");
   
-  // Shipping cost (free if subtotal > $50)
-  const shippingCost = subtotal > 50 || subtotal === 0 ? 0 : 9.99;
+  // Shipping cost (free if subtotal > ₹4,000)
+  const shippingCost = subtotal > 4000 ? 0 : 199;
   
-  // Tax (assuming 10%)
-  const tax = subtotal * 0.1;
+  // Tax (assuming 18% GST for India)
+  const tax = subtotal * 0.18;
   
   // Total cost
   const total = subtotal + shippingCost + tax;
@@ -100,7 +100,7 @@ const CartPage = () => {
                       {/* Price */}
                       <div className="lg:w-1/5 lg:text-center mb-2 lg:mb-0">
                         <div className="lg:hidden text-sm text-gray-500">Price:</div>
-                        <div className="text-gray-900">${price.toFixed(2)}</div>
+                        <div className="text-gray-900">₹{Math.round(price * 83).toLocaleString('en-IN')}</div>
                       </div>
 
                       {/* Quantity */}
@@ -126,7 +126,7 @@ const CartPage = () => {
                       {/* Total */}
                       <div className="lg:w-1/5 lg:text-center">
                         <div className="lg:hidden text-sm text-gray-500">Total:</div>
-                        <div className="text-brand font-medium">${totalPrice.toFixed(2)}</div>
+                        <div className="text-brand font-medium">₹{Math.round(totalPrice * 83).toLocaleString('en-IN')}</div>
                       </div>
 
                       {/* Remove button (desktop) */}
@@ -159,7 +159,7 @@ const CartPage = () => {
                 <div className="space-y-4">
                   <div className="flex justify-between">
                     <span className="text-gray-600">Subtotal ({itemCount} items)</span>
-                    <span className="font-medium">${subtotal.toFixed(2)}</span>
+                    <span className="font-medium">₹{Math.round(subtotal * 83).toLocaleString('en-IN')}</span>
                   </div>
                   
                   <div className="flex justify-between">
@@ -167,13 +167,13 @@ const CartPage = () => {
                     {shippingCost === 0 ? (
                       <span className="text-green-600 font-medium">Free</span>
                     ) : (
-                      <span className="font-medium">${shippingCost.toFixed(2)}</span>
+                      <span className="font-medium">₹{shippingCost.toLocaleString('en-IN')}</span>
                     )}
                   </div>
                   
                   <div className="flex justify-between">
                     <span className="text-gray-600">Tax</span>
-                    <span className="font-medium">${tax.toFixed(2)}</span>
+                    <span className="font-medium">₹{Math.round(tax * 83).toLocaleString('en-IN')}</span>
                   </div>
                   
                   <form onSubmit={handleApplyCoupon} className="pt-4 pb-2">
@@ -194,7 +194,7 @@ const CartPage = () => {
                   
                   <div className="flex justify-between pt-2">
                     <span className="text-lg font-bold">Total</span>
-                    <span className="text-lg font-bold text-brand">${total.toFixed(2)}</span>
+                    <span className="text-lg font-bold text-brand">₹{Math.round(total * 83).toLocaleString('en-IN')}</span>
                   </div>
                 </div>
 

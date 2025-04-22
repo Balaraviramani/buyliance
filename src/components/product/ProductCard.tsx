@@ -1,3 +1,4 @@
+
 import { Link } from "react-router-dom";
 import { Heart, ShoppingCart, Star } from "lucide-react";
 import { Product } from "@/types";
@@ -19,6 +20,7 @@ const ProductCard = ({ product, variant = "default" }: ProductCardProps) => {
   const { toast } = useToast();
   const [isHovered, setIsHovered] = useState(false);
   const [isInWishlist, setIsInWishlist] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -100,15 +102,18 @@ const ProductCard = ({ product, variant = "default" }: ProductCardProps) => {
     });
   };
 
-  const handleToggleFavorite = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const handleImageError = () => {
+    setImageError(true);
   };
 
   // Calculate discount percentage
   const discountPercentage = product.discountedPrice 
     ? Math.round(((product.price - product.discountedPrice) / product.price) * 100) 
     : 0;
+
+  // Convert price display to rupees
+  const priceInRupees = product.price * 83; // Using 1 USD = 83 INR conversion rate
+  const discountedPriceInRupees = product.discountedPrice ? product.discountedPrice * 83 : null;
 
   return (
     <Link 
@@ -124,9 +129,10 @@ const ProductCard = ({ product, variant = "default" }: ProductCardProps) => {
       {/* Image container */}
       <div className="relative aspect-square overflow-hidden bg-gray-100">
         <img
-          src={product.images[0]}
+          src={imageError ? "/placeholder.svg" : (product.images[0] || "/placeholder.svg")}
           alt={product.name}
           className="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
+          onError={handleImageError}
         />
 
         {/* Discount badge */}
@@ -176,13 +182,13 @@ const ProductCard = ({ product, variant = "default" }: ProductCardProps) => {
 
         {/* Price */}
         <div className="mt-2 flex items-center gap-1">
-          {product.discountedPrice ? (
+          {discountedPriceInRupees ? (
             <>
-              <span className="font-medium text-gray-900">{product.currency}{product.discountedPrice.toLocaleString('en-IN')}</span>
-              <span className="text-sm text-gray-500 line-through">{product.currency}{product.price.toLocaleString('en-IN')}</span>
+              <span className="font-medium text-gray-900">₹{Math.round(discountedPriceInRupees).toLocaleString('en-IN')}</span>
+              <span className="text-sm text-gray-500 line-through">₹{Math.round(priceInRupees).toLocaleString('en-IN')}</span>
             </>
           ) : (
-            <span className="font-medium text-gray-900">{product.currency}{product.price.toLocaleString('en-IN')}</span>
+            <span className="font-medium text-gray-900">₹{Math.round(priceInRupees).toLocaleString('en-IN')}</span>
           )}
         </div>
 

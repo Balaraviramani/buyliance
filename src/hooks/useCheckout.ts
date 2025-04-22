@@ -134,6 +134,12 @@ export const useCheckout = () => {
     
     setIsProcessing(true);
 
+    // Show toast when processing starts
+    toast({
+      title: "Processing order",
+      description: "Please wait while we process your order...",
+    });
+
     setTimeout(() => {
       setIsProcessing(false);
       clearCart();
@@ -148,6 +154,13 @@ export const useCheckout = () => {
         shippingAddress: `${data.address}, ${data.city}, ${data.state} - ${data.zipCode}, ${data.country}`,
         status: "pending"
       }));
+      
+      // Show success toast before navigation
+      toast({
+        title: "Order successfully placed",
+        description: `Your order #${orderId} has been confirmed`,
+        variant: "default",
+      });
       
       navigate("/order-confirmation");
     }, 1500);
