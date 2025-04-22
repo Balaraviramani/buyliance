@@ -1,26 +1,24 @@
-
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import MainLayout from "@/components/layout/MainLayout";
 import { products } from "@/data/products";
 import { useCart } from "@/context/CartContext";
 import { Button } from "@/components/ui/button";
-import { Heart, Share2, ShoppingCart, Truck, RotateCcw, Shield, Star, Minus, Plus } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import ProductGrid from "@/components/product/ProductGrid";
 import ReviewForm from "@/components/product/ReviewForm";
+import ProductImageGallery from "@/components/product/ProductImageGallery";
+import ProductInfo from "@/components/product/ProductInfo";
+import ProductMeta from "@/components/product/ProductMeta";
+import ProductBreadcrumbs from "@/components/product/ProductBreadcrumbs";
 
 const ProductPage = () => {
   const { id } = useParams<{ id: string }>();
   const { addItem } = useCart();
   const [quantity, setQuantity] = useState(1);
-  const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [showReviewForm, setShowReviewForm] = useState(false);
 
-  // Find the product with the matching id
   const product = products.find((p) => p.id === id);
-  
-  // Find related products (same category)
   const relatedProducts = product
     ? products.filter((p) => p.category === product.category && p.id !== product.id).slice(0, 4)
     : [];
@@ -47,201 +45,28 @@ const ProductPage = () => {
   const handleAddToCart = () => {
     addItem(product, quantity);
   };
-  
-  // Calculate discount percentage if discounted price exists
-  const discountPercentage = product.discountedPrice 
-    ? Math.round(((product.price - product.discountedPrice) / product.price) * 100) 
-    : 0;
-
-  // Convert price display to rupees
-  const priceInRupees = product.price * 83; // Using 1 USD = 83 INR conversion rate
-  const discountedPriceInRupees = product.discountedPrice ? product.discountedPrice * 83 : null;
 
   const handleReviewSubmitted = () => {
     setShowReviewForm(false);
-    // In a real app, you would refresh reviews from the server
   };
 
   return (
     <MainLayout>
       <div className="container mx-auto px-4 py-8">
-        {/* Breadcrumbs */}
-        <nav className="mb-6 text-sm">
-          <ol className="flex items-center space-x-1">
-            <li>
-              <Link to="/" className="text-gray-500 hover:text-gray-700">Home</Link>
-            </li>
-            <li className="text-gray-500">/</li>
-            <li>
-              <Link to="/shop" className="text-gray-500 hover:text-gray-700">Shop</Link>
-            </li>
-            <li className="text-gray-500">/</li>
-            <li>
-              <Link to={`/categories/${product.category.toLowerCase()}`} className="text-gray-500 hover:text-gray-700">
-                {product.category}
-              </Link>
-            </li>
-            <li className="text-gray-500">/</li>
-            <li className="text-brand font-medium">{product.name}</li>
-          </ol>
-        </nav>
+        <ProductBreadcrumbs category={product.category} productName={product.name} />
 
         {/* Product Details */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
-          {/* Product Images */}
-          <div className="space-y-4">
-            {/* Main image */}
-            <div className="aspect-square overflow-hidden rounded-lg bg-gray-100">
-              <img
-                src={product.images[activeImageIndex] || "/placeholder.svg"}
-                alt={product.name}
-                className="h-full w-full object-cover object-center"
-              />
-            </div>
-            
-            {/* Image thumbnails */}
-            <div className="flex space-x-4 overflow-auto">
-              {product.images.map((image, index) => (
-                <button
-                  key={index}
-                  onClick={() => setActiveImageIndex(index)}
-                  className={`relative aspect-square w-20 flex-shrink-0 rounded-md overflow-hidden ${
-                    activeImageIndex === index ? 'ring-2 ring-brand' : ''
-                  }`}
-                >
-                  <img
-                    src={image}
-                    alt={`${product.name} - Image ${index + 1}`}
-                    className="h-full w-full object-cover object-center"
-                  />
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* Product Info */}
+          <ProductImageGallery images={product.images} productName={product.name} />
+          
           <div className="flex flex-col space-y-6">
-            <div>
-              <h1 className="text-3xl font-bold">{product.name}</h1>
-              
-              <div className="mt-2 flex items-center space-x-2">
-                <div className="flex items-center">
-                  {Array.from({ length: 5 }).map((_, index) => (
-                    <Star
-                      key={index}
-                      className={`h-4 w-4 ${
-                        index < Math.floor(product.rating)
-                          ? 'fill-yellow-400 text-yellow-400'
-                          : 'text-gray-300'
-                      }`}
-                    />
-                  ))}
-                  <span className="ml-2 text-sm text-gray-500">{product.rating} ({product.reviews} reviews)</span>
-                </div>
-                <span className="text-gray-300">|</span>
-                <span className={`text-sm font-medium ${product.stock > 0 ? 'text-green-600' : 'text-red-500'}`}>
-                  {product.stock > 0 ? 'In Stock' : 'Out of Stock'}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex items-center">
-              {discountedPriceInRupees ? (
-                <>
-                  <span className="text-3xl font-bold text-gray-900">₹{Math.round(discountedPriceInRupees).toLocaleString('en-IN')}</span>
-                  <span className="ml-2 text-lg text-gray-500 line-through">₹{Math.round(priceInRupees).toLocaleString('en-IN')}</span>
-                  <span className="ml-2 rounded-md bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-600">
-                    {discountPercentage}% OFF
-                  </span>
-                </>
-              ) : (
-                <span className="text-3xl font-bold text-gray-900">₹{Math.round(priceInRupees).toLocaleString('en-IN')}</span>
-              )}
-            </div>
-
-            <p className="text-gray-600">{product.description}</p>
-            
-            <div className="flex flex-col space-y-4">
-              <div className="flex items-center">
-                <span className="text-sm font-medium text-gray-900 w-24">Category:</span>
-                <span className="text-sm text-gray-600">{product.category}</span>
-              </div>
-              
-              {product.tags.length > 0 && (
-                <div className="flex items-center">
-                  <span className="text-sm font-medium text-gray-900 w-24">Tags:</span>
-                  <div className="flex flex-wrap gap-2">
-                    {product.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs text-gray-600"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-
-            <div className="pt-6 border-t border-gray-200">
-              <div className="flex items-center space-x-4 mb-6">
-                <span className="text-sm font-medium text-gray-900 w-24">Quantity:</span>
-                <div className="flex items-center border border-gray-300 rounded-md">
-                  <button
-                    onClick={() => handleQuantityChange(-1)}
-                    disabled={quantity <= 1}
-                    className="px-3 py-1 text-gray-500 hover:text-gray-700 disabled:opacity-50"
-                  >
-                    <Minus className="h-4 w-4" />
-                  </button>
-                  <span className="px-4 py-1 text-center w-12">{quantity}</span>
-                  <button
-                    onClick={() => handleQuantityChange(1)}
-                    disabled={quantity >= product.stock}
-                    className="px-3 py-1 text-gray-500 hover:text-gray-700 disabled:opacity-50"
-                  >
-                    <Plus className="h-4 w-4" />
-                  </button>
-                </div>
-                <span className="text-sm text-gray-500">
-                  {product.stock} items available
-                </span>
-              </div>
-
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Button 
-                  onClick={handleAddToCart}
-                  className="flex-1 flex items-center justify-center gap-2"
-                  disabled={product.stock === 0}
-                >
-                  <ShoppingCart className="h-5 w-5" />
-                  Add to Cart
-                </Button>
-                <Button variant="outline" className="flex items-center justify-center gap-2">
-                  <Heart className="h-5 w-5" />
-                  Add to Wishlist
-                </Button>
-                <Button variant="outline" size="icon">
-                  <Share2 className="h-5 w-5" />
-                </Button>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 pt-6 border-t border-gray-200">
-              <div className="flex items-center text-sm text-gray-600">
-                <Truck className="h-4 w-4 text-brand mr-2" />
-                Free shipping over ₹4,000
-              </div>
-              <div className="flex items-center text-sm text-gray-600">
-                <RotateCcw className="h-4 w-4 text-brand mr-2" />
-                30-day return policy
-              </div>
-              <div className="flex items-center text-sm text-gray-600">
-                <Shield className="h-4 w-4 text-brand mr-2" />
-                Secure checkout
-              </div>
-            </div>
+            <ProductInfo
+              product={product}
+              quantity={quantity}
+              onQuantityChange={handleQuantityChange}
+              onAddToCart={handleAddToCart}
+            />
+            <ProductMeta />
           </div>
         </div>
 
