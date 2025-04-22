@@ -80,6 +80,9 @@ const CartPage = () => {
                             src={item.product.images[0] || "/placeholder.svg"}
                             alt={item.product.name}
                             className="w-full h-full object-cover object-center"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = "/placeholder.svg";
+                            }}
                           />
                         </div>
                         <div className="ml-4 flex-1">
@@ -110,6 +113,7 @@ const CartPage = () => {
                           <button
                             onClick={() => handleQuantityChange(item.product.id, item.quantity - 1)}
                             className="px-2 py-0.5 text-gray-600"
+                            aria-label="Decrease quantity"
                           >
                             <Minus className="h-3 w-3" />
                           </button>
@@ -117,6 +121,7 @@ const CartPage = () => {
                           <button
                             onClick={() => handleQuantityChange(item.product.id, item.quantity + 1)}
                             className="px-2 py-0.5 text-gray-600"
+                            aria-label="Increase quantity"
                           >
                             <Plus className="h-3 w-3" />
                           </button>
@@ -134,6 +139,7 @@ const CartPage = () => {
                         <button
                           onClick={() => handleRemoveItem(item.product.id)}
                           className="text-gray-400 hover:text-red-600"
+                          aria-label="Remove item"
                         >
                           <X className="h-5 w-5" />
                         </button>

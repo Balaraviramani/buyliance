@@ -35,14 +35,35 @@ const Navbar = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      const target = event.target as HTMLElement;
+      if (isMenuOpen && !target.closest('.mobile-menu-container') && !target.closest('.menu-toggle-button')) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    if (isMenuOpen) {
+      document.addEventListener('click', handleClickOutside);
+    }
+    
+    return () => {
+      document.removeEventListener('click', handleClickOutside);
+    };
+  }, [isMenuOpen]);
+
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
   return (
-    <nav className={`sticky top-0 z-40 w-full bg-white border-b border-gray-200 ${
-      isScrolled ? 'shadow-sm' : ''
-    }`}>
+    <nav 
+      className={`sticky top-0 z-40 w-full bg-white border-b border-gray-200 ${
+        isScrolled ? 'shadow-sm' : ''
+      }`}
+      aria-label="Main navigation"
+    >
       <div className="container flex items-center justify-between h-16 mx-auto px-4">
         {/* Logo */}
         <Link to="/" className="flex items-center">
@@ -65,7 +86,14 @@ const Navbar = () => {
 
           {/* Mobile menu toggle */}
           {isMobile && (
-            <Button variant="ghost" size="icon" onClick={toggleMenu}>
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              onClick={toggleMenu}
+              className="menu-toggle-button"
+              aria-expanded={isMenuOpen}
+              aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+            >
               {isMenuOpen ? (
                 <X className="h-5 w-5" />
               ) : (
@@ -78,7 +106,7 @@ const Navbar = () => {
 
       {/* Mobile Navigation */}
       {isMobile && isMenuOpen && (
-        <div className="absolute w-full bg-white border-b border-gray-200 shadow-lg py-4 animate-fade-in">
+        <div className="absolute w-full bg-white border-b border-gray-200 shadow-lg py-4 animate-fade-in mobile-menu-container">
           <div className="container mx-auto px-4 flex flex-col space-y-4">
             <SearchBar className="w-full mb-2" />
             <NavMenu 

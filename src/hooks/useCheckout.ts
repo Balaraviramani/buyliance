@@ -57,14 +57,18 @@ export const useCheckout = () => {
     mode: "onChange"
   });
   
+  // For consistency with the rest of the application, use directly rupees values
+  // instead of converting from USD
+  const rupeeSubtotal = subtotal * 83;
+  
   // Shipping cost (free if subtotal > ₹4,000)
-  const shippingCost = subtotal > 4000 ? 0 : 199;
+  const shippingCost = rupeeSubtotal > 4000 ? 0 : 199;
   
   // Tax (assuming 18% GST for India)
-  const tax = subtotal * 0.18;
+  const tax = rupeeSubtotal * 0.18;
   
   // Total cost
-  const total = subtotal + shippingCost + tax;
+  const total = rupeeSubtotal + shippingCost + tax;
 
   // Simulate loading of checkout data
   useEffect(() => {
@@ -74,6 +78,25 @@ export const useCheckout = () => {
     
     return () => clearTimeout(timer);
   }, []);
+
+  // Load saved address if available
+  useEffect(() => {
+    try {
+      const savedAddress = localStorage.getItem("savedAddress");
+      if (savedAddress) {
+        const address = JSON.parse(savedAddress);
+        form.setValue("firstName", address.firstName || "");
+        form.setValue("lastName", address.lastName || "");
+        form.setValue("address", address.address || "");
+        form.setValue("city", address.city || "");
+        form.setValue("state", address.state || "");
+        form.setValue("zipCode", address.zipCode || "");
+        form.setValue("country", address.country || "India");
+      }
+    } catch (error) {
+      console.error("Error loading saved address:", error);
+    }
+  }, [form]);
 
   const formatCardNumber = (value: string) => {
     const v = value.replace(/\s+/g, "").replace(/[^0-9]/gi, "");
@@ -139,6 +162,23 @@ export const useCheckout = () => {
       title: "Processing order",
       description: "Please wait while we process your order...",
     });
+
+    // Save address if requested
+    if (data.saveInfo) {
+      try {
+        localStorage.setItem("savedAddress", JSON.stringify({
+          firstName: data.firstName,
+          lastName: data.lastName,
+          address: data.address,
+          city: data.city,
+          state: data.state,
+          zipCode: data.zipCode,
+          country: data.country,
+        }));
+      } catch (error) {
+        console.error("Error saving address:", error);
+      }
+    }
 
     setTimeout(() => {
       setIsProcessing(false);

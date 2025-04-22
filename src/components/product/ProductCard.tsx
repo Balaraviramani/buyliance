@@ -31,11 +31,16 @@ const ProductCard = ({ product, variant = "default" }: ProductCardProps) => {
     if (!user) return;
 
     try {
-      const { data: profile } = await supabase
+      const { data: profile, error } = await supabase
         .from('profiles')
         .select('wishlist')
         .eq('id', user.id)
         .single();
+        
+      if (error) {
+        console.error('Error checking wishlist status:', error);
+        return;
+      }
 
       setIsInWishlist(profile?.wishlist?.includes(product.id) || false);
     } catch (error) {
@@ -56,11 +61,21 @@ const ProductCard = ({ product, variant = "default" }: ProductCardProps) => {
     }
 
     try {
-      const { data: profile } = await supabase
+      const { data: profile, error } = await supabase
         .from('profiles')
         .select('wishlist')
         .eq('id', user.id)
         .single();
+        
+      if (error) {
+        console.error('Error fetching profile:', error);
+        toast({
+          title: "Error",
+          description: "Failed to update wishlist",
+          variant: "destructive",
+        });
+        return;
+      }
 
       let newWishlist = profile?.wishlist || [];
 
@@ -70,10 +85,20 @@ const ProductCard = ({ product, variant = "default" }: ProductCardProps) => {
         newWishlist.push(product.id);
       }
 
-      await supabase
+      const { error: updateError } = await supabase
         .from('profiles')
         .update({ wishlist: newWishlist })
         .eq('id', user.id);
+        
+      if (updateError) {
+        console.error('Error updating wishlist:', updateError);
+        toast({
+          title: "Error",
+          description: "Failed to update wishlist",
+          variant: "destructive",
+        });
+        return;
+      }
 
       setIsInWishlist(!isInWishlist);
       toast({
@@ -133,6 +158,7 @@ const ProductCard = ({ product, variant = "default" }: ProductCardProps) => {
           alt={product.name}
           className="h-full w-full object-cover object-center transition-transform duration-300 group-hover:scale-105"
           onError={handleImageError}
+          loading="lazy"
         />
 
         {/* Discount badge */}
@@ -146,6 +172,8 @@ const ProductCard = ({ product, variant = "default" }: ProductCardProps) => {
         <button
           onClick={handleToggleWishlist}
           className="absolute right-2 top-2 rounded-full bg-white p-1.5 text-gray-700 shadow-sm transition-colors hover:text-red-500"
+          aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
+          aria-pressed={isInWishlist}
         >
           <Heart className={cn("h-4 w-4", isInWishlist && "fill-red-500 text-red-500")} />
         </button>
@@ -159,6 +187,7 @@ const ProductCard = ({ product, variant = "default" }: ProductCardProps) => {
             onClick={handleAddToCart}
             size="sm" 
             className="flex items-center gap-1 bg-white text-black hover:bg-brand hover:text-white"
+            aria-label={`Add ${product.name} to cart`}
           >
             <ShoppingCart className="h-4 w-4" />
             Add to Cart

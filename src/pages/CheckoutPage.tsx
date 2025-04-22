@@ -8,9 +8,11 @@ import OrderSummary from "@/components/checkout/OrderSummary";
 import { useCheckout } from "@/hooks/useCheckout";
 import { Progress } from "@/components/ui/progress";
 import { FormProvider } from "react-hook-form";
+import { useToast } from "@/components/ui/use-toast";
 
 const CheckoutPage = () => {
   const navigate = useNavigate();
+  const { toast } = useToast();
   const { items, subtotal, itemCount } = useCart();
   const {
     form,
@@ -27,7 +29,14 @@ const CheckoutPage = () => {
   } = useCheckout();
   
   if (itemCount === 0) {
-    navigate("/cart");
+    React.useEffect(() => {
+      toast({
+        title: "Your cart is empty",
+        description: "Please add items to your cart before proceeding to checkout",
+        variant: "destructive",
+      });
+      navigate("/cart");
+    }, []);
     return null;
   }
 
