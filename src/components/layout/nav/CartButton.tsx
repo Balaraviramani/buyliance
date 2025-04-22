@@ -6,7 +6,9 @@ import { useCart } from "@/context/CartContext";
 
 export const CartButton = () => {
   const { items } = useCart();
-  const cartItemCount = items?.length || 0;
+  
+  // Calculate total quantity across all items instead of just count of unique items
+  const cartItemCount = items.reduce((total, item) => total + item.quantity, 0);
 
   return (
     <Link to="/cart" className="relative">

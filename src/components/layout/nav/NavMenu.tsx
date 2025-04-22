@@ -1,5 +1,5 @@
 
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 interface NavLink {
   name: string;
@@ -19,19 +19,30 @@ interface NavMenuProps {
   className?: string;
 }
 
-export const NavMenu = ({ onItemClick, className = "" }: NavMenuProps) => (
-  <div className={className}>
-    {navLinks.map((link) => (
-      <Link
-        key={link.name}
-        to={link.path}
-        className="text-sm font-medium text-gray-700 transition-colors hover:text-brand"
-        onClick={onItemClick}
-      >
-        {link.name}
-      </Link>
-    ))}
-  </div>
-);
+export const NavMenu = ({ onItemClick, className = "" }: NavMenuProps) => {
+  const location = useLocation();
+  
+  return (
+    <div className={className}>
+      {navLinks.map((link) => {
+        const isActive = location.pathname === link.path || 
+                       (link.path !== "/" && location.pathname.startsWith(link.path));
+        
+        return (
+          <Link
+            key={link.name}
+            to={link.path}
+            className={`text-sm font-medium transition-colors hover:text-brand ${
+              isActive ? "text-brand font-semibold" : "text-gray-700"
+            }`}
+            onClick={onItemClick}
+          >
+            {link.name}
+          </Link>
+        );
+      })}
+    </div>
+  );
+};
 
 export { navLinks };
