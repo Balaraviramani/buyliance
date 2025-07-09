@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
+import { Star } from "lucide-react";
 import MainLayout from "@/components/layout/MainLayout";
 import { products } from "@/data/products";
 import { useCart } from "@/context/CartContext";
