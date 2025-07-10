@@ -3,23 +3,20 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import MainLayout from "@/components/layout/MainLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Product, User, Order } from "@/types";
-import { Edit, Trash2, Plus, Search, AlertTriangle } from "lucide-react";
+import { Plus, AlertTriangle } from "lucide-react";
 import AddProductForm from "@/components/admin/AddProductForm";
+import ProductsTab from "@/components/admin/ProductsTab";
+import OrdersTab from "@/components/admin/OrdersTab";
+import CustomersTab from "@/components/admin/CustomersTab";
+import SettingsTab from "@/components/admin/SettingsTab";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { products as productsData } from "@/data/products";
 
 const AdminDashboard = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>(productsData);
   const [isAddProductOpen, setIsAddProductOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [users, setUsers] = useState<User[]>([]);
-  const [orders, setOrders] = useState<Order[]>([]);
   
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -58,152 +55,6 @@ const AdminDashboard = () => {
     checkAdminStatus();
   }, [user, navigate]);
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      if (isAdmin) {
-        try {
-          const { data, error } = await supabase
-            .from('profiles')
-            .select('*');
-
-          if (error) throw error;
-          
-          const transformedUsers: User[] = (data || []).map(profile => ({
-            id: profile.id,
-            email: '',
-            firstName: profile.first_name || '',
-            lastName: profile.last_name || '',
-            isAdmin: profile.is_admin || false,
-            createdAt: profile.created_at,
-            updatedAt: profile.updated_at
-          }));
-
-          setUsers(transformedUsers);
-        } catch (error) {
-          console.error("Error fetching users:", error);
-        }
-      }
-    };
-
-    fetchUsers();
-  }, [isAdmin]);
-
-  useEffect(() => {
-    const fetchOrders = async () => {
-      if (isAdmin) {
-        try {
-          const { data, error } = await supabase
-            .from('orders')
-            .select(`
-              id, 
-              user_id,
-              subtotal, 
-              tax, 
-              shipping, 
-              total, 
-              status, 
-              created_at,
-              updated_at,
-              payment_method
-            `)
-            .order('created_at', { ascending: false });
-
-          if (error) throw error;
-          
-          const transformedOrders: Order[] = (data || []).map(order => ({
-            id: order.id,
-            userId: order.user_id,
-            items: [],
-            shippingAddress: {
-              street: '',
-              city: '',
-              state: '',
-              postalCode: '',
-              country: ''
-            },
-            paymentMethod: order.payment_method,
-            subtotal: order.subtotal,
-            tax: order.tax,
-            shipping: order.shipping,
-            total: order.total,
-            status: order.status as 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled',
-            createdAt: order.created_at,
-            updatedAt: order.updated_at,
-            paymentStatus: 'pending'
-          }));
-          
-          setOrders(transformedOrders);
-        } catch (error) {
-          console.error("Error fetching orders:", error);
-        }
-      }
-    };
-
-    fetchOrders();
-  }, [isAdmin]);
-
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const term = e.target.value;
-    setSearchTerm(term);
-    
-    const filtered = productsData.filter((product) => 
-      product.name.toLowerCase().includes(term.toLowerCase()) ||
-      product.category.toLowerCase().includes(term.toLowerCase()) ||
-      product.id.toLowerCase().includes(term.toLowerCase())
-    );
-    
-    setFilteredProducts(filtered);
-  };
-
-  const handleUpdateOrderStatus = async (orderId: string, newStatus: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled') => {
-    try {
-      const { error } = await supabase
-        .from('orders')
-        .update({ 
-          status: newStatus,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', orderId);
-
-      if (error) throw error;
-      
-      setOrders(prev => 
-        prev.map(order => 
-          order.id === orderId ? { ...order, status: newStatus } : order
-        )
-      );
-      
-      toast.success(`Order status updated to ${newStatus}`);
-    } catch (error) {
-      console.error("Error updating order status:", error);
-      toast.error("Failed to update order status");
-    }
-  };
-
-  const handleToggleAdminStatus = async (userId: string, currentStatus: boolean) => {
-    try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({ 
-          is_admin: !currentStatus,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', userId);
-
-      if (error) throw error;
-      
-      setUsers(prev => 
-        prev.map(user => 
-          user.id === userId ? { ...user, isAdmin: !currentStatus } : user
-        )
-      );
-      
-      toast.success(`User admin status updated`);
-    } catch (error) {
-      console.error("Error updating user admin status:", error);
-      toast.error("Failed to update user admin status");
-    }
-  };
 
   if (isLoading) {
     return (
@@ -254,284 +105,19 @@ const AdminDashboard = () => {
           </TabsList>
           
           <TabsContent value="products">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <div className="mb-6">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 h-4 w-4" />
-                  <Input
-                    placeholder="Search products by name, category, or ID..."
-                    value={searchTerm}
-                    onChange={handleSearch}
-                    className="pl-10"
-                  />
-                </div>
-              </div>
-              
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <tr>
-                      <th className="px-6 py-3 text-left">Product</th>
-                      <th className="px-6 py-3 text-left">ID</th>
-                      <th className="px-6 py-3 text-left">Category</th>
-                      <th className="px-6 py-3 text-left">Price</th>
-                      <th className="px-6 py-3 text-left">Stock</th>
-                      <th className="px-6 py-3 text-left">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {filteredProducts.map((product) => (
-                      <tr key={product.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <div className="flex items-center">
-                            <div className="h-10 w-10 flex-shrink-0 rounded bg-gray-100 overflow-hidden">
-                              <img
-                                src={product.images[0] || "/placeholder.svg"}
-                                alt={product.name}
-                                className="h-full w-full object-cover"
-                              />
-                            </div>
-                            <div className="ml-4">
-                              <div className="text-sm font-medium text-gray-900">{product.name}</div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {product.id}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {product.category}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                          ${product.discountedPrice || product.price}
-                          {product.discountedPrice && (
-                            <span className="ml-2 text-xs line-through text-gray-500">
-                              ${product.price}
-                            </span>
-                          )}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {product.stock}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <div className="flex space-x-2">
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
-                              <Edit className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="sm" className="h-8 w-8 p-0 text-red-600">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              
-              {filteredProducts.length === 0 && (
-                <div className="text-center py-8">
-                  <p className="text-gray-500">No products found.</p>
-                </div>
-              )}
-            </div>
+            <ProductsTab onAddProduct={() => setIsAddProductOpen(true)} />
           </TabsContent>
           
           <TabsContent value="orders">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h3 className="text-lg font-medium mb-6">Orders Management</h3>
-              
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <tr>
-                      <th className="px-6 py-3 text-left">Order ID</th>
-                      <th className="px-6 py-3 text-left">Date</th>
-                      <th className="px-6 py-3 text-left">Customer</th>
-                      <th className="px-6 py-3 text-left">Total</th>
-                      <th className="px-6 py-3 text-left">Status</th>
-                      <th className="px-6 py-3 text-left">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {orders.map((order) => (
-                      <tr key={order.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          #{order.id.substring(0, 8)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {new Date(order.createdAt).toLocaleDateString()}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {order.userId.substring(0, 8)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          ${order.total}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                            ${order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : ''}
-                            ${order.status === 'processing' ? 'bg-blue-100 text-blue-800' : ''}
-                            ${order.status === 'shipped' ? 'bg-purple-100 text-purple-800' : ''}
-                            ${order.status === 'delivered' ? 'bg-green-100 text-green-800' : ''}
-                            ${order.status === 'cancelled' ? 'bg-red-100 text-red-800' : ''}
-                          `}>
-                            {order.status}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <select 
-                            className="text-sm border border-gray-300 rounded-md"
-                            value={order.status}
-                            onChange={(e) => handleUpdateOrderStatus(
-                              order.id, 
-                              e.target.value as 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled'
-                            )}
-                          >
-                            <option value="pending">Pending</option>
-                            <option value="processing">Processing</option>
-                            <option value="shipped">Shipped</option>
-                            <option value="delivered">Delivered</option>
-                            <option value="cancelled">Cancelled</option>
-                          </select>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              
-              {orders.length === 0 && (
-                <div className="text-center py-8">
-                  <p className="text-gray-500">No orders found.</p>
-                </div>
-              )}
-            </div>
+            <OrdersTab isAdmin={isAdmin} />
           </TabsContent>
           
           <TabsContent value="customers">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h3 className="text-lg font-medium mb-6">Customer Management</h3>
-              
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-gray-50 text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <tr>
-                      <th className="px-6 py-3 text-left">ID</th>
-                      <th className="px-6 py-3 text-left">Name</th>
-                      <th className="px-6 py-3 text-left">Email</th>
-                      <th className="px-6 py-3 text-left">Admin Status</th>
-                      <th className="px-6 py-3 text-left">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {users.map((user) => (
-                      <tr key={user.id} className="hover:bg-gray-50">
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {user.id.substring(0, 8)}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          {user.firstName} {user.lastName}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                          {user.email}
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap">
-                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                            ${user.isAdmin ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}
-                          `}>
-                            {user.isAdmin ? 'Admin' : 'User'}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => handleToggleAdminStatus(user.id, user.isAdmin)}
-                          >
-                            {user.isAdmin ? 'Remove Admin' : 'Make Admin'}
-                          </Button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-              
-              {users.length === 0 && (
-                <div className="text-center py-8">
-                  <p className="text-gray-500">No users found.</p>
-                </div>
-              )}
-            </div>
+            <CustomersTab isAdmin={isAdmin} />
           </TabsContent>
           
           <TabsContent value="settings">
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h3 className="text-lg font-medium mb-4">Store Settings</h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <h4 className="font-medium mb-2">General Settings</h4>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Store Name
-                      </label>
-                      <Input defaultValue="Buyliance" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Store Email
-                      </label>
-                      <Input defaultValue="contact@buyliance.com" type="email" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Phone Number
-                      </label>
-                      <Input defaultValue="+1 (555) 123-4567" />
-                    </div>
-                  </div>
-                </div>
-                
-                <div>
-                  <h4 className="font-medium mb-2">Store Address</h4>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Address Line 1
-                      </label>
-                      <Input defaultValue="123 Commerce St" />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        City
-                      </label>
-                      <Input defaultValue="San Francisco" />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          State
-                        </label>
-                        <Input defaultValue="CA" />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          ZIP Code
-                        </label>
-                        <Input defaultValue="94105" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="mt-6">
-                <Button>Save Settings</Button>
-              </div>
-            </div>
+            <SettingsTab />
           </TabsContent>
         </Tabs>
       </div>
