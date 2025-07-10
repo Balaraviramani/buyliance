@@ -4,11 +4,11 @@ import { Heart, ShoppingCart, Star } from "lucide-react";
 import { Product } from "@/types";
 import { Button } from "@/components/ui/button";
 import { useCart } from "@/context/CartContext";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
-import { useAuth } from "@/context/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { useWishlist } from "@/hooks/useWishlist";
+import { useImageError } from "@/hooks/useImageError";
 
 interface ProductCardProps {
   product: Product;
@@ -19,102 +19,13 @@ const ProductCard = ({ product, variant = "default" }: ProductCardProps) => {
   const { addItem } = useCart();
   const { toast } = useToast();
   const [isHovered, setIsHovered] = useState(false);
-  const [isInWishlist, setIsInWishlist] = useState(false);
-  const [imageError, setImageError] = useState(false);
-  const { user } = useAuth();
-
-  useEffect(() => {
-    checkWishlistStatus();
-  }, [user, product.id]);
-
-  const checkWishlistStatus = async () => {
-    if (!user) return;
-
-    try {
-      const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('wishlist')
-        .eq('id', user.id)
-        .single();
-        
-      if (error) {
-        console.error('Error checking wishlist status:', error);
-        return;
-      }
-
-      setIsInWishlist(profile?.wishlist?.includes(product.id) || false);
-    } catch (error) {
-      console.error('Error checking wishlist status:', error);
-    }
-  };
+  const { isInWishlist, toggleWishlist } = useWishlist(product.id);
+  const { imageError, handleImageError } = useImageError();
 
   const handleToggleWishlist = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-
-    if (!user) {
-      toast({
-        title: "Please login",
-        description: "You need to be logged in to add items to your wishlist",
-      });
-      return;
-    }
-
-    try {
-      const { data: profile, error } = await supabase
-        .from('profiles')
-        .select('wishlist')
-        .eq('id', user.id)
-        .single();
-        
-      if (error) {
-        console.error('Error fetching profile:', error);
-        toast({
-          title: "Error",
-          description: "Failed to update wishlist",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      let newWishlist = profile?.wishlist || [];
-
-      if (isInWishlist) {
-        newWishlist = newWishlist.filter((id: string) => id !== product.id);
-      } else {
-        newWishlist.push(product.id);
-      }
-
-      const { error: updateError } = await supabase
-        .from('profiles')
-        .update({ wishlist: newWishlist })
-        .eq('id', user.id);
-        
-      if (updateError) {
-        console.error('Error updating wishlist:', updateError);
-        toast({
-          title: "Error",
-          description: "Failed to update wishlist",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      setIsInWishlist(!isInWishlist);
-      toast({
-        title: isInWishlist ? "Removed from wishlist" : "Added to wishlist",
-        description: isInWishlist 
-          ? `${product.name} has been removed from your wishlist`
-          : `${product.name} has been added to your wishlist`,
-      });
-    } catch (error) {
-      console.error('Error updating wishlist:', error);
-      toast({
-        title: "Error",
-        description: "Failed to update wishlist",
-        variant: "destructive",
-      });
-    }
+    await toggleWishlist(product.name);
   };
 
   const handleAddToCart = (e: React.MouseEvent) => {
@@ -125,10 +36,6 @@ const ProductCard = ({ product, variant = "default" }: ProductCardProps) => {
       title: "Added to cart",
       description: `${product.name} has been added to your cart.`,
     });
-  };
-
-  const handleImageError = () => {
-    setImageError(true);
   };
 
   // Calculate discount percentage
